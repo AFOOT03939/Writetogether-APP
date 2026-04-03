@@ -1,0 +1,25 @@
+:root {
+  /* colores principales */
+  --color-primary: #b65b06;
+  --color-primary-dark: #8e511a;
+  --color-secondary: #e67e22;
+
+  /* fondos */
+  --color-bg-main: #3d2817;
+  --color-bg-secondary: #2c1810;
+  --color-bg-card: #4a3426;
+  --color-bg-input: #2e3235;
+
+  /* texto */
+  --color-text: #ffffff;
+  --color-text-muted: #b8a693;
+
+  /* bordes */
+  --color-border: #6b4c37;
+
+  /* extras */
+  --color-accent: #f39c12;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+}
