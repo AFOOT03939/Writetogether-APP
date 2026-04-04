@@ -1,4 +1,19 @@
-export default function Navbar({ onLogin, onSignup }: any) {
+import { type MouseEventHandler } from "react";
+
+interface Props{
+  onSignup: MouseEventHandler;
+  onLogin: MouseEventHandler;
+  isLogged: boolean;
+  name: string | undefined;
+}
+
+export default function Navbar({ onLogin, onSignup, isLogged, name }: Props) {
+
+    const logout = async (e: React.FormEvent) => {
+        localStorage.removeItem("token")
+        window.location.reload();
+    }
+
   return (
     <header className="sticky top-0 z-50 bg-[var(--color-dark,#333)] shadow-md">
 
@@ -46,36 +61,48 @@ export default function Navbar({ onLogin, onSignup }: any) {
         {/* ⚙️ ACTIONS */}
         <div className="flex items-center gap-2 md:gap-3 text-white text-sm">
 
-          <span className="hidden md:block">Hello: AFOOT</span>
+          {isLogged && (
+          <>
+              <span className="hidden md:block">Hello: {name}</span>
 
-          <button className="px-3 md:px-4 py-2 rounded-full bg-[var(--color-primary,#e67e22)] hover:bg-[var(--color-secondary)] transition transform hover:-translate-y-0.5 text-xs md:text-sm">
-            Start a new story
-          </button>
+              <button className="px-3 md:px-4 py-2 rounded-full bg-[var(--color-primary,#e67e22)] hover:bg-[var(--color-secondary)] transition transform hover:-translate-y-0.5 text-xs md:text-sm">
+                Start a new story
+              </button>
 
-          <button className="px-3 md:px-4 py-2 rounded-full border-2 border-[var(--color-primary,#e67e22)] text-[var(--color-primary,#e67e22)] hover:bg-[var(--color-primary,#e67e22)] hover:text-white transition text-xs md:text-sm">
-            Profile
-          </button>
+              <button className="px-3 md:px-4 py-2 rounded-full border-2 border-[var(--color-primary,#e67e22)] text-[var(--color-primary,#e67e22)] hover:bg-[var(--color-primary,#e67e22)] hover:text-white transition text-xs md:text-sm">
+                Profile
+              </button>
+            </>
+          )}
 
-          {/* 🔥 LOGIN */}
-          <span
-            onClick={onLogin}
-            className="text-[var(--color-primary,#e67e22)] cursor-pointer hover:underline text-xs md:text-sm"
-          >
-            Log-in
-          </span>
+          {!isLogged && (
+            <>
+              {/* LOGIN */}
+              <span
+              onClick={onLogin}
+              className="text-[var(--color-primary,#e67e22)] cursor-pointer hover:underline text-xs md:text-sm"
+              >
+              Log-in
+              </span>
 
-          {/* 🔥 SIGNUP */}
-          <span
-            onClick={onSignup}
-            className="text-[var(--color-primary,#e67e22)] cursor-pointer hover:underline text-xs md:text-sm"
-          >
-            Sign-up
-          </span>
+              {/* SIGNUP */}
+              <span
+                onClick={onSignup}
+                className="text-[var(--color-primary,#e67e22)] cursor-pointer hover:underline text-xs md:text-sm"
+              >
+                Sign-up
+              </span>
+            </>
+          )}
 
           {/* LOGOUT */}
-          <span className="text-[var(--color-primary,#e67e22)] cursor-pointer hover:underline hover:text-orange-400 text-xs md:text-sm">
+          {isLogged && (
+          <span 
+            onClick={logout}
+            className="text-[var(--color-primary,#e67e22)] cursor-pointer hover:underline hover:text-orange-400 text-xs md:text-sm">
             Log-out
           </span>
+          )}
 
         </div>
       </div>

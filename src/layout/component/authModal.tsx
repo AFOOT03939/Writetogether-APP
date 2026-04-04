@@ -6,9 +6,11 @@ interface Props {
   type: 'login' | 'signup';
   onClose: () => void;
   switchMode: (mode: 'login' | 'signup') => void;
+  setLogged(logged: boolean): void;
+  setName(name:string): void;
 }
 
-export default function AuthModal({ type, onClose, switchMode }: Props) {
+export default function AuthModal({ type, onClose, switchMode, setLogged, setName }: Props) {
     const [form, setForm] = useState({
         userName: '',
         email: '',
@@ -31,6 +33,9 @@ export default function AuthModal({ type, onClose, switchMode }: Props) {
         const res = await Login(body)
 
         localStorage.setItem("token", res.token)
+
+        setLogged(true);
+        setName(res.name)
     }
 
     const handleSubmitLogin = async (e: React.FormEvent) => {
