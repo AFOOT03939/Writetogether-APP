@@ -1,11 +1,30 @@
+import { useEffect, useState } from "react";
 import "../css/mainpage.css"
+import type { Story } from "../../../globals/models/storyCard.model";
+import { getStories } from "../api/stories.api";
+import StoryCard from "../../../globals/components/storyCard";
 
 export default function HomePage() {
+
+  const [stories, setStories] = useState<Story[]>([]);
+
+  useEffect(() => {
+    const loadStories = async () => {
+      try{
+          const resp = await getStories();
+          setStories(resp)
+      }catch(err){
+        console.log("Error en get de Stories", err)
+      }
+    };
+
+    loadStories();
+  }, []);
 
   return (
     <div className="home">
 
-      {/* 🟧 HERO SECTION */}
+      {/* HERO SECTION */}
       <section className="hero-section">
         <div className="hero-content">
           <h1 className="hero-title">WriteTogether</h1>
@@ -15,34 +34,16 @@ export default function HomePage() {
         </div>
 
         <div className="hero-image">
-          {/* 🧩 FUTURO COMPONENTE: HeroImage */}
+          {/* FUTURO COMPONENTE: HeroImage */}
         </div>
       </section>
 
-      {/* 📚 STORIES SECTION */}
+      {/* STORIES SECTION */}
       <section className="stories-section">
         <div className="stories-grid">
-
-          {/* 🧩 FUTURO COMPONENTE: StoryCard */}
-          {/* Ejemplo estructura */}
-          <div className="story-card">
-            <div className="story-image">📖</div>
-
-            <div className="story-info">
-              <h3>Story Title</h3>
-
-              <div className="story-rating">
-                {/* ⭐ FUTURO COMPONENTE: Rating */}
-              </div>
-
-              <div className="story-meta">
-                <div>Author:</div>
-                <div>Category:</div>
-                <div>Date:</div>
-              </div>
-            </div>
-          </div>
-
+        {stories.slice(0, 10).map((story) => (
+          <StoryCard key={story.storyId} story={story} />
+        ))}
         </div>
       </section>
 
