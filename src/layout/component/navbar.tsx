@@ -19,7 +19,7 @@ export default function Navbar({ onLogin, onSignup, isLogged, name }: Props) {
 
       <div className="flex items-center justify-between px-4 md:px-6 py-3 gap-4">
 
-        {/* 🟠 LEFT */}
+        {/* LEFT */}
         <div className="flex items-center gap-4">
 
           <div className="w-10 h-10 bg-[var(--color-primary,#e67e22)] rounded-full flex items-center justify-center font-bold text-[#333]">
@@ -50,15 +50,15 @@ export default function Navbar({ onLogin, onSignup, isLogged, name }: Props) {
 
         </div>
 
-        {/* 🔍 SEARCH */}
+        {/* SEARCH */}
         <div className="flex-1 flex justify-center">
           <input
             placeholder="Search stories..."
-            className="w-full max-w-md px-4 py-2 rounded-full bg-white/90 text-[#333] text-sm outline-none focus:bg-white focus:shadow-lg focus:shadow-orange-400/40 transition"
+            className="bg-white w-full max-w-md px-4 py-2 rounded-full text-[#333] text-sm outline-none focus:bg-white focus:shadow-lg focus:shadow-orange-400/40 transition"
           />
         </div>
 
-        {/* ⚙️ ACTIONS */}
+        {/* ACTIONS */}
         <div className="flex items-center gap-2 md:gap-3 text-white text-sm">
 
           {isLogged && (

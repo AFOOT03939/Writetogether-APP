@@ -21,7 +21,3 @@ a {
 button {
   cursor: pointer;
 }
-
-input {
-  background-color: var( --color-bg-input);
-}

@@ -1,21 +1,67 @@
+/*HERO*/
 
+.hero-wrapper {
+  background: var(--color-primary-dark);
+  width: 100%;
+}
 
-/* HERO */
 .hero-section {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+
+  max-width: 1200px;
+  margin: 0 auto;
+
   padding: 40px;
-  background: var(--color-primary-dark);
 }
 
 .hero-image {
-  width: 300px;
-  height: 150px;
-  background: #ccc;
+  position: relative;
+  width: 100%;
+
+  height: 200px;
+
   border-radius: 15px;
+  overflow: hidden;
+
+  box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
 }
 
-/* STORIES */
+/* imagen */
+.hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* overlay oscuro */
+.hero-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+}
+
+/* texto encima */
+.hero-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+
+  z-index: 1;
+}
+
+
+/*STORIES*/
+
 .stories-section {
   padding: 20px;
 }
@@ -24,36 +70,101 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .story-card {
-  background: #4a3426;
+  background: var(--color-bg-card);
   border-radius: 15px;
   padding: 15px;
 }
 
+
 /* GENRES */
+
 .genres-section {
-  padding: 40px;
+  padding: 60px 30px;
   text-align: center;
+  background: var(--color-primary-dark);
 }
 
+.section-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+
+  color: white;
+
+  text-shadow: 0px 4px 15px rgba(0, 0, 0, 0.4);
+
+  margin-bottom: 10px;
+}
+
+.section-subtitle {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  margin-bottom: 40px;
+}
+
+/* CONTENEDOR */
 .genres-grid {
   display: grid;
+
   grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
+  grid-template-rows: repeat(4, 1fr);
+
+  gap: 15px;
+
+  max-width: 900px;
+  margin: 0 auto;
+
+  transform: perspective(1000px) rotateX(5deg);
+  transition: transform 0.5s ease;
 }
 
+.genres-grid:hover {
+  transform: perspective(1000px) rotateX(0deg);
+}
+
+/* BOTONES */
 .genre-btn {
-  background: #9d622e;
-  border: 2px solid #e67e22;
+  background: rgba(157, 98, 46, 0.8);
+  border: 2px solid var(--color-secondary);
   color: white;
-  padding: 10px;
-  border-radius: 20px;
+
+  padding: 18px 25px;
+  border-radius: 25px;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease;
 }
 
-/* AI */
+/* HOVER */
+.genre-btn:hover {
+  background: var(--color-secondary);
+  transform: translateY(-6px) scale(1.05);
+}
+
+/* POSICIONAMIENTO (LO IMPORTANTE) */
+.genre-btn:nth-child(1) { grid-column: 2; grid-row: 1; }
+.genre-btn:nth-child(2) { grid-column: 4; grid-row: 1; }
+
+.genre-btn:nth-child(3) { grid-column: 1; grid-row: 2; }
+.genre-btn:nth-child(4) { grid-column: 3; grid-row: 2; }
+.genre-btn:nth-child(5) { grid-column: 5; grid-row: 2; }
+
+.genre-btn:nth-child(6) { grid-column: 2; grid-row: 3; }
+.genre-btn:nth-child(7) { grid-column: 4; grid-row: 3; }
+
+.genre-btn:nth-child(8) { grid-column: 1; grid-row: 4; }
+.genre-btn:nth-child(9) { grid-column: 3; grid-row: 4; }
+.genre-btn:nth-child(10){ grid-column: 5; grid-row: 4; }
+
+
+/*AI SECTION*/
+
 .ai-section {
   padding: 40px;
-  background: #2c1810;
+  background: var(--color-bg-secondary);
 }

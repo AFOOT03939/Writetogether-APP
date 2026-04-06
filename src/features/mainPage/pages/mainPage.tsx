@@ -23,21 +23,39 @@ export default function HomePage() {
 
   return (
     <div className="home">
+      <div className="hero-wrapper">
+        <section className="hero-section flex items-center justify-between max-w-[1200px] mx-auto gap-12 py-12 px-6">
 
-      {/* HERO SECTION */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <h1 className="hero-title">WriteTogether</h1>
-          <p className="hero-subtitle">
-            Where we collab to make incredible stories...
-          </p>
-        </div>
+          {/* LEFT */}
+          <div className="flex-1 text-white">
 
-        <div className="hero-image">
-          {/* FUTURO COMPONENTE: HeroImage */}
-        </div>
-      </section>
+            <h1 className="text-5xl md:text-6xl font-bold mb-4 drop-shadow-md">
+              WriteTogether
+            </h1>
 
+            <p className="text-lg md:text-xl text-[var(--color-text-muted)]">
+              Where we collab to make incredible stories...
+            </p>
+
+          </div>
+
+          {/* RIGHT */}
+          <div className="hero-image">
+
+            <img 
+              src="/src/assets/MenuFoto.png"
+              className="hero-img"
+            />
+
+            <div className="hero-text">
+              Where we collab to make incredible stories...
+            </div>
+
+          </div>
+
+        </section>
+      </div>
+      
       {/* STORIES SECTION */}
       <section className="stories-section">
         <div className="stories-grid">
@@ -47,7 +65,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ✨ PARTICLES */}
+      {/* PARTICLES */}
       <div className="particle" style={{ left: '10%' }} />
       <div className="particle" style={{ left: '20%' }} />
       <div className="particle" style={{ left: '30%' }} />
@@ -58,7 +76,7 @@ export default function HomePage() {
       <div className="particle" style={{ left: '80%' }} />
       <div className="particle" style={{ left: '90%' }} />
 
-      {/* 🎭 GENRES SECTION */}
+      {/* GENRES SECTION */}
       <section className="genres-section">
         <h2 className="section-title">Una variedad de géneros</h2>
         <p className="section-subtitle">
@@ -68,7 +86,7 @@ export default function HomePage() {
         <div className="genres-container">
           <div className="genres-grid">
 
-            {/* 🧩 FUTURO COMPONENTE: GenreButton */}
+            {/* FUTURO COMPONENTE: GenreButton */}
             <button className="genre-btn">Fantasy</button>
             <button className="genre-btn">Romance</button>
             <button className="genre-btn">Mystery</button>
@@ -84,26 +102,67 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 🤖 AI SECTION */}
-      <section className="ai-section">
-        <div className="ai-placeholder">
+      {/* AI SECTION */}
+      <section className="ai-section flex justify-center py-16 px-4">
 
-          <h2>Asistente de Escritura con IA</h2>
+        <div className="
+          max-w-[800px] w-full
+          bg-[var(--color-bg-card)]
+          rounded-2xl
+          p-8 md:p-10
+          shadow-xl
+          border border-[var(--color-border)]
+          text-center
+        ">
 
-          <p>
-            Tu compañero de escritura inteligente ya está activo.
+          {/* TITLE */}
+          <h2 className="
+            text-2xl md:text-3xl 
+            font-bold 
+            text-[var(--color-secondary)]
+            mb-4
+          ">
+            Asistente de Escritura con IA
+          </h2>
+
+          {/* DESCRIPTION */}
+          <p className="
+            text-[var(--color-text-muted)]
+            text-sm md:text-base
+            mb-6
+          ">
+            Tu compañero de escritura inteligente ya está activo. Utiliza la potencia
+            de Gemini AI para llevar tu historia colaborativa al siguiente nivel:
           </p>
 
-          <ul>
-            <li><strong>Corrección Contextual</strong></li>
-            <li><strong>Coherencia Global</strong></li>
-            <li><strong>Ortografía y Gramática</strong></li>
-            <li><strong>Continuidad</strong></li>
+          {/* LIST */}
+          <ul className="text-left space-y-3 text-sm md:text-base text-white">
+
+            <li>
+              <strong>Corrección Contextual:</strong> Corrige fragmentos adaptando el estilo
+              y tono a lo que ya se ha escrito.
+            </li>
+
+            <li>
+              <strong>Coherencia Global:</strong> Utiliza "Correct all story" para unificar la
+              narrativa y eliminar contradicciones entre autores.
+            </li>
+
+            <li>
+              <strong>Ortografía y Gramática:</strong> Limpieza instantánea de errores de
+              redacción y puntuación.
+            </li>
+
+            <li>
+              <strong>Continuidad:</strong> Asegura que cada nueva aportación fluya
+              naturalmente con la historia.
+            </li>
+
           </ul>
 
         </div>
-      </section>
 
+      </section>
     </div>
   );
 }

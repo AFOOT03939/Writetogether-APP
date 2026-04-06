@@ -96,32 +96,32 @@ export default function AuthModal({ type, onClose, switchMode, setLogged, setNam
 
             {/* NAME */}
             {!isLogin && (
-                <div>
+                <div className="form">
                     <label className="text-white text-sm">Name</label>
                     <input
                     name="userName"
                     value={form.userName}
                     onChange={handleChange}
                     placeholder="User..."
-                    className="w-full mt-1 p-2 rounded-lg bg-gray-800 text-white outline-none"
+                    className="w-full mt-1 p-2 rounded-lg bg-[var(--color-bg-input)] text-white outline-none"
                     />
                 </div>
             )}
 
             {/* EMAIL (solo signup) */}
-            <div>
+            <div className="form">
             <label className="text-white text-sm">E-mail</label>
             <input
                 name="email"
                 value={form.email}
                 onChange={handleChange}
                 placeholder="user@domain.com"
-                className="w-full mt-1 p-2 rounded-lg bg-gray-800 text-white outline-none"
+                className="w-full mt-1 p-2 rounded-lg bg-[var(--color-bg-input)] text-white outline-none"
             />
             </div>
 
             {/* PASSWORD */}
-            <div>
+            <div className="form">
                 <label className="text-white text-sm">Password</label>
                 <input
                 type="password"
@@ -129,7 +129,7 @@ export default function AuthModal({ type, onClose, switchMode, setLogged, setNam
                 value={form.password}
                 onChange={handleChange}
                 placeholder="********"
-                className="w-full mt-1 p-2 rounded-lg bg-gray-800 text-white outline-none"
+                className="w-full mt-1 p-2 rounded-lg bg-[var(--color-bg-input)] text-white outline-none"
                 />
             </div>
 

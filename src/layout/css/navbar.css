@@ -13,7 +13,7 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* 🟠 LOGO */
+/* LOGO */
 .logo {
   width: 40px;
   height: 40px;
@@ -29,37 +29,7 @@
   color: #333;
 }
 
-/* 🔍 SEARCH */
-.search {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.search input {
-  width: 100%;
-  max-width: 400px;
-
-  padding: 10px 15px;
-
-  border: none;
-  border-radius: 25px;
-
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
-
-  font-size: 14px;
-
-  transition: 0.3s;
-}
-
-.search input:focus {
-  outline: none;
-  background: white;
-  box-shadow: 0 0 10px var(--color-primary);
-}
-
-/* ⚙️ ACTIONS */
+/* ACTIONS */
 .actions {
   display: flex;
   align-items: center;
@@ -69,7 +39,7 @@
   font-size: 14px;
 }
 
-/* 🔘 BOTONES */
+/* BOTONES */
 .btn {
   padding: 8px 15px;
   border-radius: 20px;
@@ -103,7 +73,7 @@
   color: white;
 }
 
-/* 🚪 LOGOUT */
+/* LOGOUT */
 .logout {
   cursor: pointer;
   color: var(--color-primary);
