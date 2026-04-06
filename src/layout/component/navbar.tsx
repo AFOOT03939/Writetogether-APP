@@ -1,6 +1,5 @@
 import { useEffect, useState, type MouseEventHandler } from "react";
 import { getCategories } from "../../globals/api/api";
-import type { Story } from "../../globals/models/storyCard.model";
 import type { Category } from "../../globals/models/category.model";
 
 interface Props{
@@ -27,7 +26,7 @@ export default function Navbar({ onLogin, onSignup, isLogged, name }: Props) {
     loadStories();
   }, []);
 
-  const logout = async (e: React.FormEvent) => {
+  const logout = async () => {
         localStorage.removeItem("token")
         window.location.reload();
   }
