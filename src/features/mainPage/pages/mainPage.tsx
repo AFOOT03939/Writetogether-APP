@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "../css/mainpage.css"
 import type { Story } from "../../../globals/models/storyCard.model";
-import { getStories } from "../api/stories.api";
+import { getStories } from "../api/main.api";
 import StoryCard from "../../../globals/components/storyCard";
 
 export default function HomePage() {

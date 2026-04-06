@@ -1,4 +1,7 @@
-import { type MouseEventHandler } from "react";
+import { useEffect, useState, type MouseEventHandler } from "react";
+import { getCategories } from "../../globals/api/api";
+import type { Story } from "../../globals/models/storyCard.model";
+import type { Category } from "../../globals/models/category.model";
 
 interface Props{
   onSignup: MouseEventHandler;
@@ -9,10 +12,25 @@ interface Props{
 
 export default function Navbar({ onLogin, onSignup, isLogged, name }: Props) {
 
-    const logout = async (e: React.FormEvent) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const loadStories = async () => {
+      try{
+          const category = await getCategories();
+          setCategories(category)
+      }catch(err){
+        console.log("Error en get de Stories", err)
+      }
+    };
+
+    loadStories();
+  }, []);
+
+  const logout = async (e: React.FormEvent) => {
         localStorage.removeItem("token")
         window.location.reload();
-    }
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-[var(--color-dark,#333)] shadow-md">
@@ -34,15 +52,13 @@ export default function Navbar({ onLogin, onSignup, isLogged, name }: Props) {
             <div className="absolute left-0 mt-2 w-48 bg-[var(--color-bg-secondary,#2c1810)] border border-[var(--color-border,#4a3426)] rounded-lg shadow-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
 
               <div className="flex flex-col">
-                <span className="px-4 py-2 hover:bg-orange-500 hover:text-white cursor-pointer">
-                  My Stories
-                </span>
-                <span className="px-4 py-2 hover:bg-orange-500 hover:text-white cursor-pointer">
-                  Popular
-                </span>
-                <span className="px-4 py-2 hover:bg-orange-500 hover:text-white cursor-pointer">
-                  New
-                </span>
+                {/*Carga todas las categorias */}
+                {categories.map((story) => (
+                  <span className="px-4 py-2 hover:bg-orange-500 hover:text-white cursor-pointer">
+                  {story.name}
+                  </span>
+                ))}
+
               </div>
 
             </div>
