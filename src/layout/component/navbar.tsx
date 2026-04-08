@@ -1,6 +1,7 @@
 import { useEffect, useState, type MouseEventHandler } from "react";
 import { getCategories } from "../../globals/api/api";
 import type { Category } from "../../globals/models/category.model";
+import { useNavigate } from "react-router-dom";
 
 interface Props{
   onSignup: MouseEventHandler;
@@ -12,6 +13,7 @@ interface Props{
 export default function Navbar({ onLogin, onSignup, isLogged, name }: Props) {
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const loadStories = async () => {
@@ -80,7 +82,9 @@ export default function Navbar({ onLogin, onSignup, isLogged, name }: Props) {
           <>
               <span className="hidden md:block">Hello: {name}</span>
 
-              <button className="px-3 md:px-4 py-2 rounded-full bg-[var(--color-primary,#e67e22)] hover:bg-[var(--color-secondary)] transition transform hover:-translate-y-0.5 text-xs md:text-sm">
+              <button 
+              onClick={() => navigate("/categories")}
+              className="px-3 md:px-4 py-2 rounded-full bg-[var(--color-primary,#e67e22)] hover:bg-[var(--color-secondary)] transition transform hover:-translate-y-0.5 text-xs md:text-sm">
                 Start a new story
               </button>
 

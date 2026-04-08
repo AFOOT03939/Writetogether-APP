@@ -15,7 +15,7 @@ export default function StoryCard({ story, onClick }: Props) {
         bg-[var(--color-bg-card)]
         rounded-xl
         p-4
-        w-[220px]
+        w-full
         cursor-pointer
         transition
         hover:scale-105
@@ -52,7 +52,7 @@ export default function StoryCard({ story, onClick }: Props) {
       {/* META */}
       <div className="text-[var(--color-text-muted)] text-xs space-y-1">
         <div>Author: {story.authorName ?? "Unknown"}</div>
-        <div>Category: {story.category ?? "Fantasy"}</div>
+        <div>Category: {story.category ?? "Unknown"}</div>
         <div>Status: {story.status ?? "Unknown"}</div>
         <div>
           Date:{" "}
