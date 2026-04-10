@@ -30,12 +30,7 @@ export async function changePhoto(file: File) {
   return data;
 }
 
-export async function editCharacter(status: string | null, categoryId?: number| null){
-    const {data} = await axiosClient.get("/stories/filtered", {
-        params: {
-            status: status || undefined, 
-            categoryId: categoryId || undefined
-        }
-    })
+export async function editCharacter(name: string){
+    const {data} = await axiosClient.put("/users", name)
     return data
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import StoryCard from "../../../globals/components/storyCard";
 import type { Story } from "../../../globals/models/storyCard.model";
-import { getUsers} from "../api/profile.api";
+import { editCharacter, getUsers} from "../api/profile.api";
 import type { User } from "../../../layout/models/user.model";
 
 
@@ -47,6 +47,16 @@ export default function ProfilePage() {
         );
 
         setIsEditingName(false);
+        const edit = async () => {
+              try{
+                    const user = await editCharacter(userName);
+                    setUsers(user)
+              }catch(err){
+                console.log("Error en get de Stories", err)
+              }
+            };
+        edit();
+        window.location.reload();
         console.log("Nombre actualizado a:", userName);
     } catch (error) {
         console.error("Error al actualizar el nombre:", error);
