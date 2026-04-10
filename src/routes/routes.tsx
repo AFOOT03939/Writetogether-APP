@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainPage from '../features/mainPage/pages/mainPage';
 import MainLayout from '../layout/pages/mainLayout';
 import CategoryPage from '../features/categories/pages/categoryPage';
+import ProfilePage from '../features/profile/pages/profilePage';
 
 export default function AppRoutes() {
   return (
@@ -22,6 +23,15 @@ export default function AppRoutes() {
           element={
             <MainLayout>
               <CategoryPage />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <MainLayout>
+              <ProfilePage />
             </MainLayout>
           }
         />

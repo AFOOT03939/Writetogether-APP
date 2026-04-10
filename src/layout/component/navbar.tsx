@@ -42,7 +42,7 @@ export default function Navbar({ onLogin, onSignup, isLogged, name }: Props) {
         <div className="flex items-center gap-4">
 
           <div className="w-10 h-10 bg-[var(--color-primary,#e67e22)] rounded-full flex items-center justify-center font-bold text-[#333]">
-            W
+            <button onClick={() => navigate("/")}>W</button>
           </div>
 
           <div className="relative group hidden sm:block">
@@ -88,7 +88,9 @@ export default function Navbar({ onLogin, onSignup, isLogged, name }: Props) {
                 Start a new story
               </button>
 
-              <button className="px-3 md:px-4 py-2 rounded-full border-2 border-[var(--color-primary,#e67e22)] text-[var(--color-primary,#e67e22)] hover:bg-[var(--color-primary,#e67e22)] hover:text-white transition text-xs md:text-sm">
+              <button 
+                onClick={() => navigate("/profile")}
+                className="px-3 md:px-4 py-2 rounded-full border-2 border-[var(--color-primary,#e67e22)] text-[var(--color-primary,#e67e22)] hover:bg-[var(--color-primary,#e67e22)] hover:text-white transition text-xs md:text-sm">
                 Profile
               </button>
             </>
