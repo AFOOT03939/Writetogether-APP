@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import StoryCard from "../../../globals/components/storyCard";
 import type { Story } from "../../../globals/models/storyCard.model";
-import { editCharacter, getUsers} from "../api/profile.api";
+import { changePhoto, editCharacter, getImage, getUsers} from "../api/profile.api";
 import type { User } from "../../../layout/models/user.model";
 
 
@@ -33,6 +33,7 @@ export default function ProfilePage() {
                     if (user?.username) {
                         setUserName(user.username);
                     }
+                    
               }catch(err){
                 console.log("Error en get de Stories", err)
               }
@@ -63,6 +64,21 @@ export default function ProfilePage() {
     }
     };
 
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        console.log(file);
+         const upload = async () => {
+              try{
+                    await changePhoto(file);
+              }catch(err){
+                console.log("Error al subir la imagen", err)
+              }
+            };
+        upload();
+    };
+
     return (
         <div className="bg-[var(--color-bg-main)] min-h-screen text-[var(--color-text)] font-sans p-4 md:p-8">
         <div className="flex flex-col md:flex-row gap-8 max-w-[1600px] mx-auto">
@@ -72,7 +88,7 @@ export default function ProfilePage() {
             
             <div className="relative">
                 <div className="w-36 h-36 rounded-full bg-[var(--color-bg-input)] flex items-center justify-center border-4 border-[var(--color-border)] text-5xl">
-                👤
+                <img src={`https://localhost:7219${users?.imageUrl}`}></img>
                 </div>
             </div>
 
@@ -95,7 +111,18 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex gap-3 w-full">
-                <button className="flex-1 px-4 py-2 rounded-full border border-[var(--color-secondary)] text-[var(--color-text)] text-sm font-medium hover:bg-[var(--color-secondary)] transition">
+                <input
+                type="file"
+                accept="image/*"
+                id="photoInput"
+                className="hidden"
+                onChange={handlePhotoChange}
+                />
+
+                <button
+                onClick={() => document.getElementById("photoInput")?.click()}
+                className="flex-1 px-4 py-2 rounded-full border border-[var(--color-secondary)] text-[var(--color-text)] text-sm font-medium hover:bg-[var(--color-secondary)] transition"
+                >
                 Change photo
                 </button>
                 <button 

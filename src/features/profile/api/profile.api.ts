@@ -15,6 +15,12 @@ export async function getFragments(){
     return data
 }
 
+export async function getImage(filename: string){
+    const {data} = await axiosClient.get(`/users/images/${filename}`)
+    return data
+}
+
+
 export async function changePhoto(file: File) {
   // Creamos una instancia de FormData
   const formData = new FormData();
