@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import StoryCard from "../../../globals/components/storyCard";
 import type { Story } from "../../../globals/models/storyCard.model";
-import { changePhoto, editCharacter, getImage, getUsers} from "../api/profile.api";
+import { changePhoto, editCharacter, getFragments, getImage, getUsers} from "../api/profile.api";
 import type { User } from "../../../layout/models/user.model";
+import { getStories } from "../../mainPage/api/main.api";
+import type { Fragment } from "../../../layout/models/fragment.model";
 
 
 // Iconos
@@ -21,6 +23,7 @@ const ChevronDownIcon = () => (
 export default function ProfilePage() {
     const [stories, setStories] = useState<Story[]>([]);
     const [users, setUsers] = useState<User>();
+    const [fragments, setFragments] = useState<Fragment[]>([]);
     const [isEditingName, setIsEditingName] = useState(false);
     const [userName, setUserName] = useState<string>("");
 
@@ -28,6 +31,10 @@ export default function ProfilePage() {
         const loadData = async () => {
               try{
                     const user = await getUsers();
+                    const story = await getStories();
+                    const fragment = await getFragments();
+                    setFragments(fragment)
+                    setStories(story)
                     setUsers(user)
 
                     if (user?.username) {
@@ -84,104 +91,101 @@ export default function ProfilePage() {
         <div className="flex flex-col md:flex-row gap-8 max-w-[1600px] mx-auto">
             
             {/* PANEL LATERAL IZQUIERDO */}
-            <aside className="w-full md:w-80 bg-[var(--color-bg-card)] rounded-3xl p-8 flex flex-col items-center gap-6 border border-[var(--color-border)] shadow-xl h-fit">
-            
-            <div className="relative">
-                <div className="w-36 h-36 rounded-full bg-[var(--color-bg-input)] flex items-center justify-center border-4 border-[var(--color-border)] text-5xl">
-                <img src={`https://localhost:7219${users?.imageUrl}`}></img>
-                </div>
-            </div>
-
-            {isEditingName ? (
-            <input
-                type="text"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                autoFocus 
-                onKeyDown={(e) => e.key === "Enter" && handleSaveName()} 
-                className="text-3xl font-extrabold tracking-tight bg-[var(--color-bg-input)] text-[var(--color-text)] border border-[var(--color-accent)] rounded px-2 py-1 text-center w-full md:w-3/4 outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-all"
-            />
-            ) : (
-            <h2 className="text-[var(--color-text)] text-3xl font-extrabold tracking-tight">{users?.username}</h2>
-            )}
-
-            <div className="flex items-center gap-2 text-[var(--color-accent)] font-semibold text-lg">
-                <StarIcon />
-                <span>Reputation: 120</span>
-            </div>
-
-            <div className="flex gap-3 w-full">
-                <input
-                type="file"
-                accept="image/*"
-                id="photoInput"
-                className="hidden"
-                onChange={handlePhotoChange}
-                />
-
-                <button
-                onClick={() => document.getElementById("photoInput")?.click()}
-                className="flex-1 px-4 py-2 rounded-full border border-[var(--color-secondary)] text-[var(--color-text)] text-sm font-medium hover:bg-[var(--color-secondary)] transition"
-                >
-                Change photo
-                </button>
-                <button 
-                onClick={() => isEditingName ? handleSaveName() : setIsEditingName(true)}
-                className="flex-1 px-4 py-2 rounded-full border border-[var(--color-secondary)] text-[var(--color-text)] text-sm font-medium hover:bg-[var(--color-secondary)] transition">
-                Edit Name
-                </button>
-            </div>
-
-            <div className="w-full mt-6 space-y-5">
-                <h3 className="text-[var(--color-text)] text-xl font-bold">My Stories</h3>
+            <div className="w-full md:w-80 shrink-0">
                 
-                <div className="space-y-3">
-                <div className="flex justify-between items-center text-base">
-                    <span className="text-[var(--color-text)] font-medium">Stories:</span>
-                    <span className="text-[var(--color-text-muted)] font-semibold">3</span>
-                </div>
-                <div className="flex justify-between items-center text-base">
-                    <span className="text-[var(--color-text)] font-medium">Fragments:</span>
-                    <span className="text-[var(--color-text-muted)] font-semibold">12</span>
-                </div>
+                {/* PANEL LATERAL IZQUIERDO REAL (AHORA ES FIXED) */}
+                <aside className="mt-17 w-full md:w-80 md:fixed md:top-8 md:max-h-[calc(90vh-4rem)] overflow-y-auto bg-[var(--color-bg-card)] rounded-3xl p-8 flex flex-col items-center gap-6 border border-[var(--color-border)] shadow-xl">
+                
+                <div className="relative">
+                    <div className="w-36 h-36 rounded-full bg-[var(--color-bg-input)] overflow-hidden flex items-center justify-center border-4 border-[var(--color-border)] text-5xl">
+                    <img className="w-full h-full object-cover" src={`https://localhost:7219${users?.imageUrl}`} alt="Profile" />
+                    </div>
                 </div>
 
-                <div className="border-t border-[var(--color-border)] pt-4">
-                <div className="flex justify-between items-center text-[var(--color-text)] cursor-pointer hover:text-[var(--color-accent)] transition">
-                    <span className="font-semibold">All stories</span>
-                    <ChevronDownIcon />
+                {isEditingName ? (
+                <input
+                    type="text"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                    autoFocus 
+                    onKeyDown={(e) => e.key === "Enter" && handleSaveName()} 
+                    className="text-3xl font-extrabold tracking-tight bg-[var(--color-bg-input)] text-[var(--color-text)] border border-[var(--color-accent)] rounded px-2 py-1 text-center w-full md:w-3/4 outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-all"
+                />
+                ) : (
+                <h2 className="text-[var(--color-text)] text-3xl font-extrabold tracking-tight">{users?.username}</h2>
+                )}
+
+                <div className="flex items-center gap-2 text-[var(--color-accent)] font-semibold text-lg">
+                    <StarIcon />
+                    <span>Reputation: {users?.reputationPoints}</span>
                 </div>
+
+                <div className="flex gap-3 w-full">
+                    <input
+                    type="file"
+                    accept="image/*"
+                    id="photoInput"
+                    className="hidden"
+                    onChange={handlePhotoChange}
+                    />
+
+                    <button
+                    onClick={() => document.getElementById("photoInput")?.click()}
+                    className="flex-1 px-4 py-2 rounded-full border border-[var(--color-secondary)] text-[var(--color-text)] text-sm font-medium hover:bg-[var(--color-secondary)] transition"
+                    >
+                    Change photo
+                    </button>
+                    <button 
+                    onClick={() => isEditingName ? handleSaveName() : setIsEditingName(true)}
+                    className="flex-1 px-2 py-1 rounded-full border border-[var(--color-secondary)] text-[var(--color-text)] text-sm font-medium hover:bg-[var(--color-secondary)] transition">
+                    Edit Name
+                    </button>
                 </div>
+
+                <div className="w-full  space-y-5">
+                    <h3 className="text-[var(--color-text)] text-xl font-bold">My Stories</h3>
+                    
+                    <div className="space-y-3">
+                    <div className="flex justify-between items-center text-base">
+                        <span className="text-[var(--color-text)] font-medium">Stories:</span>
+                        <span className="text-[var(--color-text-muted)] font-semibold">{stories.length}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-base">
+                        <span className="text-[var(--color-text)] font-medium">Fragments:</span>
+                        <span className="text-[var(--color-text-muted)] font-semibold">{fragments?.length}</span>
+                    </div>
+                    </div>
+                </div>
+
+                </aside>
             </div>
-
-            <div className="w-full mt-8 border-t border-[var(--color-border)] pt-6 space-y-4">
-                <h3 className="text-[var(--color-text)] text-xl font-bold">Story rating</h3>
-                <div className="text-[var(--color-text-muted)] text-sm space-y-3">
-                <div className="text-[var(--color-accent)] text-lg flex gap-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i}>☆</span>
-                    ))}
-                </div>
-                <p>Be the first to rate this story!</p>
-                </div>
-            </div>
-
-            </aside>
 
             {/* PANEL PRINCIPAL DERECHO */}
             <main className="flex-1 flex flex-col gap-8">
             
-            {/* SECCIÓN MY STORIES */}
             <section className="bg-[var(--color-bg-card)] rounded-3xl p-8 border border-[var(--color-border)] shadow-xl">
-                <h3 className="text-[var(--color-text)] text-2xl font-bold mb-8">My Stories</h3>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {stories.map((story) => (
-                    <StoryCard key={story.storyId} story={story} />
-                ))}
-                </div>
-            </section>
+            <h3 className="text-[var(--color-text)] text-2xl font-bold mb-8">
+                My Stories
+            </h3>
 
+            <div
+                className={
+                stories.length > 3
+                    ? "flex gap-6 overflow-x-auto pb-2"
+                    : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                }
+            >
+                {stories.map((story) => (
+                <div
+                    key={story.storyId}
+                    className={stories.length > 3 ? "min-w-[300px] flex-shrink-0" : ""}
+                >
+                    <StoryCard story={story} />
+                </div>
+                ))}
+            </div>
+            </section>
+            
             {/* SECCIÓN MY CONTRIBUTIONS (Con Placeholder) */}
             <section className="bg-[var(--color-bg-card)] rounded-3xl p-8 border border-[var(--color-border)] shadow-xl">
                 <h3 className="text-[var(--color-text)] text-2xl font-bold mb-8">My Contributions</h3>
