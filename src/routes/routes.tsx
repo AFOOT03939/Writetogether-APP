@@ -3,6 +3,7 @@ import MainPage from '../features/mainPage/pages/mainPage';
 import MainLayout from '../layout/pages/mainLayout';
 import CategoryPage from '../features/categories/pages/categoryPage';
 import ProfilePage from '../features/profile/pages/profilePage';
+import StoryPage from '../features/stories/pages/storyPage';
 
 export default function AppRoutes() {
   return (
@@ -32,6 +33,15 @@ export default function AppRoutes() {
           element={
             <MainLayout>
               <ProfilePage />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/story"
+          element={
+            <MainLayout>
+              <StoryPage />
             </MainLayout>
           }
         />

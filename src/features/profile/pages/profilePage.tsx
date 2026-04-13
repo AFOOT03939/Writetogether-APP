@@ -14,12 +14,6 @@ const StarIcon = () => (
   </svg>
 );
 
-const ChevronDownIcon = () => (
-  <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
-    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-  </svg>
-);
-
 export default function ProfilePage() {
     const [stories, setStories] = useState<Story[]>([]);
     const [users, setUsers] = useState<User>();
@@ -87,17 +81,17 @@ export default function ProfilePage() {
     };
 
     return (
-        <div className="bg-[var(--color-bg-main)] min-h-screen text-[var(--color-text)] font-sans p-4 md:p-8">
-        <div className="flex flex-col md:flex-row gap-8 max-w-[1600px] mx-auto">
+        <div className="bg-(--color-bg-main) min-h-screen text-(--color-text) font-sans p-4 md:p-8">
+        <div className="flex flex-col md:flex-row gap-8 max-w-400 mx-auto">
             
             {/* PANEL LATERAL IZQUIERDO */}
             <div className="w-full md:w-80 shrink-0">
                 
                 {/* PANEL LATERAL IZQUIERDO REAL (AHORA ES FIXED) */}
-                <aside className="mt-17 w-full md:w-80 md:fixed md:top-8 md:max-h-[calc(90vh-4rem)] overflow-y-auto bg-[var(--color-bg-card)] rounded-3xl p-8 flex flex-col items-center gap-6 border border-[var(--color-border)] shadow-xl">
+                <aside className="mt-17 w-full md:w-80 md:fixed md:top-8 md:max-h-[calc(90vh-4rem)] overflow-y-auto bg-(--color-bg-card) rounded-3xl p-8 flex flex-col items-center gap-6 border border-(--color-border) shadow-xl">
                 
                 <div className="relative">
-                    <div className="w-36 h-36 rounded-full bg-[var(--color-bg-input)] overflow-hidden flex items-center justify-center border-4 border-[var(--color-border)] text-5xl">
+                    <div className="w-36 h-36 rounded-full bg-(--color-bg-input) overflow-hidden flex items-center justify-center border-4 border-(--color-border) text-5xl">
                     <img className="w-full h-full object-cover" src={`https://localhost:7219${users?.imageUrl}`} alt="Profile" />
                     </div>
                 </div>
@@ -109,13 +103,13 @@ export default function ProfilePage() {
                     onChange={(e) => setUserName(e.target.value)}
                     autoFocus 
                     onKeyDown={(e) => e.key === "Enter" && handleSaveName()} 
-                    className="text-3xl font-extrabold tracking-tight bg-[var(--color-bg-input)] text-[var(--color-text)] border border-[var(--color-accent)] rounded px-2 py-1 text-center w-full md:w-3/4 outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition-all"
+                    className="text-3xl font-extrabold tracking-tight bg-(--color-bg-input) text-(--color-text) border border-(--color-accent) rounded px-2 py-1 text-center w-full md:w-3/4 outline-none focus:ring-2 focus:ring-(--color-accent) transition-all"
                 />
                 ) : (
-                <h2 className="text-[var(--color-text)] text-3xl font-extrabold tracking-tight">{users?.username}</h2>
+                <h2 className="text-(--color-text) text-3xl font-extrabold tracking-tight">{users?.username}</h2>
                 )}
 
-                <div className="flex items-center gap-2 text-[var(--color-accent)] font-semibold text-lg">
+                <div className="flex items-center gap-2 text-(--color-accent) font-semibold text-lg">
                     <StarIcon />
                     <span>Reputation: {users?.reputationPoints}</span>
                 </div>
@@ -131,28 +125,28 @@ export default function ProfilePage() {
 
                     <button
                     onClick={() => document.getElementById("photoInput")?.click()}
-                    className="flex-1 px-4 py-2 rounded-full border border-[var(--color-secondary)] text-[var(--color-text)] text-sm font-medium hover:bg-[var(--color-secondary)] transition"
+                    className="flex-1 px-4 py-2 rounded-full border border-(--color-secondary) text-(--color-text) text-sm font-medium hover:bg-(--color-secondary) transition"
                     >
                     Change photo
                     </button>
                     <button 
                     onClick={() => isEditingName ? handleSaveName() : setIsEditingName(true)}
-                    className="flex-1 px-2 py-1 rounded-full border border-[var(--color-secondary)] text-[var(--color-text)] text-sm font-medium hover:bg-[var(--color-secondary)] transition">
+                    className="flex-1 px-2 py-1 rounded-full border border-(--color-secondary) text-(--color-text) text-sm font-medium hover:bg-(--color-secondary) transition">
                     Edit Name
                     </button>
                 </div>
 
                 <div className="w-full  space-y-5">
-                    <h3 className="text-[var(--color-text)] text-xl font-bold">My Stories</h3>
+                    <h3 className="text-(--color-text) text-xl font-bold">My Stories</h3>
                     
                     <div className="space-y-3">
                     <div className="flex justify-between items-center text-base">
-                        <span className="text-[var(--color-text)] font-medium">Stories:</span>
-                        <span className="text-[var(--color-text-muted)] font-semibold">{stories.length}</span>
+                        <span className="text-(--color-text) font-medium">Stories:</span>
+                        <span className="text-(--color-text-muted) font-semibold">{stories.length}</span>
                     </div>
                     <div className="flex justify-between items-center text-base">
-                        <span className="text-[var(--color-text)] font-medium">Fragments:</span>
-                        <span className="text-[var(--color-text-muted)] font-semibold">{fragments?.length}</span>
+                        <span className="text-(--color-text) font-medium">Fragments:</span>
+                        <span className="text-(--color-text-muted) font-semibold">{fragments?.length}</span>
                     </div>
                     </div>
                 </div>
@@ -163,8 +157,8 @@ export default function ProfilePage() {
             {/* PANEL PRINCIPAL DERECHO */}
             <main className="flex-1 flex flex-col gap-8">
             
-            <section className="bg-[var(--color-bg-card)] rounded-3xl p-8 border border-[var(--color-border)] shadow-xl">
-            <h3 className="text-[var(--color-text)] text-2xl font-bold mb-8">
+            <section className="bg-(--color-bg-card) rounded-3xl p-8 border border-(--color-border) shadow-xl">
+            <h3 className="text-(--color-text) text-2xl font-bold mb-8">
                 My Stories
             </h3>
 
@@ -178,7 +172,7 @@ export default function ProfilePage() {
                 {stories.map((story) => (
                 <div
                     key={story.storyId}
-                    className={stories.length > 3 ? "min-w-[300px] flex-shrink-0" : ""}
+                    className={stories.length > 3 ? "min-w-75 shrink-0" : ""}
                 >
                     <StoryCard story={story} />
                 </div>
@@ -187,12 +181,12 @@ export default function ProfilePage() {
             </section>
             
             {/* SECCIÓN MY CONTRIBUTIONS (Con Placeholder) */}
-            <section className="bg-[var(--color-bg-card)] rounded-3xl p-8 border border-[var(--color-border)] shadow-xl">
-                <h3 className="text-[var(--color-text)] text-2xl font-bold mb-8">My Contributions</h3>
+            <section className="bg-(--color-bg-card) rounded-3xl p-8 border border-(--color-border) shadow-xl">
+                <h3 className="text-(--color-text) text-2xl font-bold mb-8">My Contributions</h3>
                 
                 {/* Aquí insertarás tu componente ContributionFragment mediante un map() más adelante */}
                 <div className="space-y-4">
-                <div className="p-6 border border-dashed border-[var(--color-border)] rounded-xl text-center text-[var(--color-text-muted)] bg-[var(--color-bg-main)] opacity-50">
+                <div className="p-6 border border-dashed border-(--color-border) rounded-xl text-center text-(--color-text-muted) bg-(--color-bg-main) opacity-50">
                     {/* <ContributionFragment /> */}
                     [ Placeholder para el componente de Fragmentos ]
                 </div>
