@@ -7,10 +7,9 @@ interface Props {
   onClose: () => void;
   switchMode: (mode: 'login' | 'signup') => void;
   setLogged(logged: boolean): void;
-  setName(name:string): void;
 }
 
-export default function AuthModal({ type, onClose, switchMode, setLogged, setName }: Props) {
+export default function AuthModal({ type, onClose, switchMode, setLogged }: Props) {
     const [form, setForm] = useState({
         userName: '',
         email: '',
@@ -31,7 +30,6 @@ export default function AuthModal({ type, onClose, switchMode, setLogged, setNam
         }
 
         const res = await Login(body)
-
         localStorage.setItem("token", res.token)
 
         setLogged(true);

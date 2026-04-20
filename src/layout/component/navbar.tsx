@@ -2,18 +2,33 @@ import { useEffect, useState, type MouseEventHandler } from "react";
 import { getCategories } from "../../globals/api/api";
 import type { Category } from "../../globals/models/category.model";
 import { useNavigate } from "react-router-dom";
+import type { User } from "../../globals/models/user.model";
+import { getUser } from "../../features/stories/api/story.api";
 
 interface Props{
   onSignup: MouseEventHandler;
   onLogin: MouseEventHandler;
   isLogged: boolean;
-  name: string | undefined;
 }
 
-export default function Navbar({ onLogin, onSignup, isLogged, name }: Props) {
+export default function Navbar({ onLogin, onSignup, isLogged}: Props) {
 
   const [categories, setCategories] = useState<Category[]>([]);
-  const navigate = useNavigate()
+  const [name, setName] = useState<User>();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const user = await getUser();
+      setName(user);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+    if (isLogged) fetchUser();
+  }, [isLogged]);
 
   useEffect(() => {
     const loadStories = async () => {
@@ -46,23 +61,13 @@ export default function Navbar({ onLogin, onSignup, isLogged, name }: Props) {
           </div>
 
           <div className="relative group hidden sm:block">
-            <span className="cursor-pointer text-white font-medium">
+            <span 
+              onClick={() => navigate("/categories")}
+              className="cursor-pointer text-white font-medium">
               Stories +
             </span>
 
-            <div className="absolute left-0 mt-2 w-48 bg-[var(--color-bg-secondary,#2c1810)] border border-[var(--color-border,#4a3426)] rounded-lg shadow-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
-
-              <div className="flex flex-col">
-                {/*Carga todas las categorias */}
-                {categories.map((story) => (
-                  <span className="px-4 py-2 hover:bg-orange-500 hover:text-white cursor-pointer">
-                  {story.name}
-                  </span>
-                ))}
-
-              </div>
-
-            </div>
+            
           </div>
 
         </div>
@@ -80,10 +85,10 @@ export default function Navbar({ onLogin, onSignup, isLogged, name }: Props) {
 
           {isLogged && (
           <>
-              <span className="hidden md:block">Hello: {name}</span>
+              <span className="hidden md:block">Hello: {name?.userName}</span>
 
               <button 
-              onClick={() => navigate("/categories")}
+              onClick={() => navigate("/story")}
               className="px-3 md:px-4 py-2 rounded-full bg-[var(--color-primary,#e67e22)] hover:bg-[var(--color-secondary)] transition transform hover:-translate-y-0.5 text-xs md:text-sm">
                 Start a new story
               </button>

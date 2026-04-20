@@ -8,6 +8,5 @@ export interface Story {
   createdAt?: string;
 
   authorName?: string;
-  category?: string;
   rating?: number;
 }

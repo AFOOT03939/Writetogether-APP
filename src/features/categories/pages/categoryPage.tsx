@@ -35,10 +35,10 @@ export default function CategoryPage() {
         {/* HEADER*/}
         <section className="category-hero">
             <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-md mb-3">
-            Category
+            Stories
             </h1>
             <p className="text-lg text-[var(--color-text)] mb-6">
-            Descubre increíbles historias de esta categoría
+            Discover Incredible Stories
             </p>
             
             <div className="category-stats">

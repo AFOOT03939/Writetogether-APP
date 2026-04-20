@@ -46,6 +46,15 @@ export default function AppRoutes() {
           }
         />
 
+        <Route
+          path="/story/:storyId"
+          element={
+            <MainLayout>
+              <StoryPage />
+            </MainLayout>
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   );

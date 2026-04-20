@@ -1,18 +1,61 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import type { StoriesCollaboratorsModel, StoriesModel } from '../models/story.model';
+import CategoryItem from './categoryItem';
+import TagItem from './tagItem';
+import { getCollaborators } from '../api/story.api';
+import { useParams } from 'react-router-dom';
 
-export default function SideCard() {
+interface props{
+  story: StoriesModel;
+  setStory: React.Dispatch<React.SetStateAction<StoriesModel>>;
+}
 
-  const [category, setCategory] = useState("Fantasy");
+export default function SideCard({story, setStory}: props) {
+
   const [tagInput, setTagInput] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
+  const [collaborators, setCollaborators] = useState<StoriesCollaboratorsModel[]>([])
 
+  const categories = [
+    { id: 1, name: "Fantasy" },
+    { id: 2, name: "Science Fiction" },
+    { id: 3, name: "Romance" },
+    { id: 4, name: "Horror" },
+    { id: 5, name: "Mystery" },
+    { id: 6, name: "Adventure" },
+    { id: 7, name: "Drama" },
+    { id: 8, name: "Comedy" },
+    { id: 9, name: "Historical" },
+    { id: 10, name: "Thriller" }
+  ];
+
+  const {storyId} = useParams();
 
   const handleAddTag = () => {
-    if (tagInput.trim() !== "") {
-      setTags([...tags, tagInput.trim()]);
-      setTagInput("");
-    }
+    const newTag = tagInput.trim();
+
+    if (!newTag) return;
+
+    setStory(prev => ({
+      ...prev,
+      tags: prev.tags.includes(newTag)
+        ? prev.tags
+        : [...prev.tags, newTag]
+    }));
+
+    setTagInput("");
   };
+
+  useEffect(() => {
+    if(!storyId) return;
+
+      const fetchCollaborators = async () => {
+        const collaborators = await getCollaborators(storyId);
+        console.log(collaborators);
+        setCollaborators(collaborators)
+      };
+
+      fetchCollaborators();
+    }, [storyId]);
 
   return (
     <div className="bg-(--color-bg-card) rounded-2xl p-6 border border-(--color-border) shadow-xl flex flex-col gap-6 w-full text-(--color-text)">
@@ -26,16 +69,27 @@ export default function SideCard() {
       <div>
         <h3 className="font-medium text-(--color-text) mb-2">Collaborators:</h3>
         <ul className="list-disc list-inside text-(--color-text-muted) text-sm ml-2">
-          <li>None</li>
+          {collaborators.map(col => (
+            <li>{col.userName}</li>
+          ))}
+          <li></li>
         </ul>
       </div>
 
       {/* CATEGORY */}
       <div>
-        <h3 className="font-medium text-(--color-text) mb-2">Category:</h3>
-        <select 
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
+        <h3 className='mb-2'>Category:</h3>
+
+        {/* seleccion */}
+        <select
+          onChange={(e) => {
+            const newCategory = e.target.value;
+
+            setStory(prev => ({
+              ...prev,
+              categoryIds: [...(prev.categoryIds || []), Number(newCategory)]
+            }));
+          }}
           className="w-full bg-(--color-bg-main) text-(--color-text) border border-(--color-border) rounded-lg px-3 py-2.5 outline-none focus:border-(--color-accent) transition-colors appearance-none cursor-pointer"
           style={{
             backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23b8a693" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>')`,
@@ -44,43 +98,32 @@ export default function SideCard() {
             backgroundSize: '16px'
           }}
         >
-          <option value="Fantasy">Fantasy</option>
-          <option value="Sci-Fi">Sci-Fi</option>
-          <option value="Romance">Romance</option>
-          <option value="Mystery">Mystery</option>
+          <option value="">Select</option>
+          {categories.map(cat => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
         </select>
-      </div>
 
-      {/* TAGS */}
-      <div>
-        <h3 className="font-medium text-(--color-text) mb-2">Tags:</h3>
-        
-        {/* Lista de tags agregados */}
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-3">
-            {tags.map((tag, index) => (
-              <span key={index} className="px-2 py-1 bg-(--color-bg-main) border border-(--color-border) rounded text-xs text-(--color-text-muted)">
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
+        {/* render */}
+        <div className="flex flex-wrap gap-2 mt-2">
+        {story.categoryIds?.map((id) => {
+            const category = categories.find(c => c.id === id);
 
-        <div className="flex gap-3 items-center">
-          <input
-            type="text"
-            placeholder="Type a tag..."
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
-            className="flex-1 bg-(--color-bg-main) text-(--color-text) placeholder-(--color-text-muted) border border-(--color-border) rounded-lg px-3 py-2 outline-none focus:border-(--color-accent) transition-colors"
-          />
-          <button 
-            onClick={handleAddTag}
-            className="w-10 h-10 shrink-0 bg-(--color-secondary) hover:bg-(--color-primary) text-white rounded-full flex items-center justify-center font-bold text-xl transition-colors shadow-md"
-          >
-            +
-          </button>
+            return (
+              <CategoryItem
+                key={id}
+                label={category?.name || "Unknown"}
+                onRemove={() =>
+                  setStory(prev => ({
+                    ...prev,
+                    categoryIds: prev.categoryIds.filter(c => c !== id)
+                  }))
+                }
+              />
+            );
+          })}
         </div>
       </div>
 
