@@ -76,12 +76,12 @@ export async function getComments(storyId: string) {
   return data;
 }
 
-export async function createComment(storyId: string, message: string, userId: number) {
+export async function createComment(storyId: string, message: string) {
   const { data } = await axiosClient.post(`/story-messages`, {
     storyId,
-    userId,
     message
   });
+
   return data;
 }
 
