@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import StoryCard from '../features/stories/components/inputCard';
+import StoryCard from '../features/stories/components/storyCard';
 import { describe, test, expect, vi } from 'vitest';
 
 vi.mock('../features/stories/api/story.api', () => ({

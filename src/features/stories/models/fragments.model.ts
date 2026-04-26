@@ -4,4 +4,5 @@ export interface Fragment {
   userId: number;
   userName: string;
   createdAt: string;
+  imageUrl?: string;
 }

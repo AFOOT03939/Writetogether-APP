@@ -76,7 +76,7 @@ export async function getComments(storyId: string) {
   return data;
 }
 
-export async function createComment(storyId: string, message: string) {
+export async function createComment(storyId: string, message: string | null) {
   const { data } = await axiosClient.post(`/story-messages`, {
     storyId,
     message
@@ -85,9 +85,10 @@ export async function createComment(storyId: string, message: string) {
   return data;
 }
 
-export async function updateComment(id: number, message: string) {
+export async function updateComment(id: number,message: string,removeImage?: boolean) {
   await axiosClient.put(`/story-messages/${id}`, {
-    message
+    message,
+    removeImage 
   });
 }
 
@@ -111,3 +112,39 @@ export async function uploadImage(storyId: string, image: File) {
 
   return data;
 }
+
+export async function uploadImageFragments(fragmentId: string, image: File) {
+  const formData = new FormData();
+  formData.append("file", image);
+
+  const { data } = await axiosClient.post(
+    `/fragments/${fragmentId}/image`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    }
+  );
+
+  return data;
+}
+
+export async function uploadImageMessage(messageId: string, image: File) {
+  const formData = new FormData();
+  formData.append("file", image);
+
+  const { data } = await axiosClient.post(
+    `/story-messages/${messageId}/image`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    }
+  );
+
+  return data;
+}
+
+

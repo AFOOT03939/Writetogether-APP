@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import SideCard from '../components/sideCard';
-import StoryCard from '../components/inputCard';
+import StoryCard from '../components/storyCard';
 import CommentsSection from '../components/commentSection';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { StoriesModel, StoriesModelRequest } from '../models/story.model';
@@ -140,7 +140,7 @@ export default function ReadStoryPage() {
           backgroundRepeat: 'repeat'
         }}
       >
-        <div className="max-w-300 w-full flex flex-col md:flex-row justify-around items-center gap-4 bg-[rgba(61,40,23,0.7)] p-6 rounded-xl backdrop-blur-sm border border-(--color-border)">
+        <div className="max-w-300 w-full flex flex-col md:flex-row justify-between items-end gap-4 bg-[rgba(61,40,23,0.7)] p-6 rounded-xl backdrop-blur-sm border border-(--color-border)">
           {/* IMAGEN */}
           <div className="flex items-center gap-10">
             <div

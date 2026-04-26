@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { createFragment, deleteFragment, getFragments, getUser, updateFragment } from '../api/story.api';
+import { createFragment, deleteFragment, getFragments, getUser, updateFragment, uploadImageFragments } from '../api/story.api';
 import type { Fragment } from '../models/fragments.model';
 import { useParams } from 'react-router-dom';
 import ContentCard from '../../../globals/components/ContentCard';
@@ -9,7 +9,13 @@ export default function StoryCard() {
   const [newFragment, setNewFragment] = useState("");
   const [currentUser, setCurrentUser] = useState<any>();
 
-  const {storyId} = useParams()
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const [showAiInput, setShowAiInput] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+
+  const { storyId } = useParams();
 
   useEffect(() => {
     if (!storyId) return;
@@ -28,22 +34,54 @@ export default function StoryCard() {
     fetchUser();
   }, [storyId]);
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    setShowAiInput(false);
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+  };
+
+  const handleAiGenerate = () => {
+    console.log("AI prompt:", aiPrompt);
+  };
+
   const handleSubmit = async () => {
-    if (!newFragment.trim()) return;
-    if(!storyId) return;
+    if (!storyId || !currentUser) return;
+    if (!newFragment.trim() && !imageFile) return;
 
     const res = await createFragment(storyId, newFragment);
+
+    let imageUrl: string | undefined = undefined;
+
+    if (imageFile) {
+      const uploadRes = await uploadImageFragments(res.fragmentId, imageFile);
+
+      // validar respuesta del backend
+      if (uploadRes && uploadRes.imageUrl) {
+        imageUrl = uploadRes.imageUrl;
+      }
+    }
 
     const newItem: Fragment = {
       fragmentId: res.fragmentId,
       content: newFragment,
       userId: currentUser.userId,
       userName: currentUser.userName,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      imageUrl
     };
 
     setFragments(prev => [...prev, newItem]);
+
     setNewFragment("");
+    handleRemoveImage();
   };
 
   const handleUpdate = async (id: number, text: string) => {
@@ -64,13 +102,11 @@ export default function StoryCard() {
     );
   };
 
-
   return (
     <div className="bg-(--color-bg-card) rounded-xl border border-(--color-border) shadow-2xl flex flex-col w-full">
-      
-      {/* ZONA DE FRAGMENTOS (Se separará después)*/}
-      <div className="flex flex-col divide-y divide-[rgba(255,255,255,0.05)] max-h-screen h-100">
-        
+
+      {/* LISTA */}
+      <div className="flex flex-col divide-y divide-[rgba(255,255,255,0.05)] max-h-screen h-100 overflow-y-auto">
         {fragments.length === 0 ? (
           <p className="text-(--color-text-muted) p-4 text-sm">
             No fragments yet...
@@ -83,32 +119,56 @@ export default function StoryCard() {
                 content={f.content}
                 createdAt={new Date(f.createdAt).toLocaleDateString()}
                 variant="fragment"
-
+                imageUrl={f.imageUrl} // FIX: ahora sí se renderiza
                 canEdit={f.userId === currentUser?.userId}
                 canDelete={f.userId === currentUser?.userId}
-
                 onUpdate={(text) => handleUpdate(f.fragmentId, text)}
                 onDelete={() => handleDelete(f.fragmentId)}
               />
             </div>
           ))
         )}
-
       </div>
 
-      {/* ZONA DE ESCRITURA*/}
+      {/* INPUT */}
       <div className="p-6 border-t border-(--color-border) bg-[rgba(0,0,0,0.1)] rounded-b-xl">
-        <h3 className="text-white font-bold text-lg mb-4">Write next fragment</h3>
-        
+        <h3 className="text-white font-bold text-lg mb-4">
+          Write next fragment
+        </h3>
+
         <div className="flex flex-col md:flex-row gap-4">
-          <textarea
-            value={newFragment}
-            onChange={(e) => setNewFragment(e.target.value)}
-            placeholder="Type your text here..."
-            className="flex-1 bg-[#1a110b] text-(--color-text) placeholder-[#6b5c50] border border-(--color-border) rounded-xl p-4 min-h-25 outline-none focus:border-(--color-accent) transition-colors resize-none shadow-inner"
-          />
+
+          <div className="flex-1 flex flex-col gap-3">
+            <textarea
+              value={newFragment}
+              onChange={(e) => setNewFragment(e.target.value)}
+              placeholder="Type your text here..."
+              className="w-full bg-[#1a110b] text-(--color-text) border border-(--color-border) rounded-xl p-4 min-h-25 outline-none resize-none"
+            />
+
+            {imagePreview && (
+              <div className="relative w-fit">
+                <img
+                  src={imagePreview}
+                  className="h-40 rounded-lg border object-cover"
+                />
+                <button onClick={handleRemoveImage}>
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {showAiInput && (
+              <input
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                placeholder="Describe image..."
+              />
+            )}
+
+          </div>
           
-          {/* Stack de Botones */}
+          {/* Stack de Botones Originales (Sin cambios) */}
           <div className="flex flex-col gap-2 w-full md:w-36 shrink-0">
             <button 
               onClick={handleSubmit}
@@ -122,9 +182,9 @@ export default function StoryCard() {
               Improve text
             </button>
           </div>
+
         </div>
       </div>
-
     </div>
   );
 }

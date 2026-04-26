@@ -6,15 +6,22 @@ import {
   createComment,
   updateComment,
   deleteComment,
-  getUser
+  getUser,
+  uploadImageMessage
 } from '../api/story.api';
 
 import type { Comment } from "../../stories/models/comments.model";
+import Input from '../../../globals/components/input';
 
 export default function CommentsSection() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState("");
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const [showAiInput, setShowAiInput] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
 
   const { storyId } = useParams();
 
@@ -36,29 +43,48 @@ export default function CommentsSection() {
   }, [storyId]);
 
   const handlePostComment = async () => {
-    if (!commentText.trim()) return;
+    if (!commentText.trim() && !imageFile) return;
     if (!storyId || !currentUser) return;
 
     const res = await createComment(storyId, commentText);
+
+    let imageUrl = "";
+
+    if (imageFile) {
+      const uploadRes = await uploadImageMessage(res.messageId, imageFile);
+
+      if (uploadRes?.imageUrl) {
+        imageUrl = uploadRes.imageUrl;
+      }
+    }
 
     const newItem: Comment = {
       messageId: res.messageId,
       message: commentText,
       userId: currentUser.userId,
       userName: currentUser.userName,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      imageUrl 
     };
 
-    setComments(prev => [...prev, newItem]);
-    setCommentText("");
-  };
+  setComments(prev => [...prev, newItem]);
 
-  const handleUpdate = async (id: number, text: string) => {
+  setCommentText("");
+  handleRemoveImage();
+};
+
+  const handleUpdate = async (id: number, text: string, removeImage?: boolean) => {
     await updateComment(id, text);
 
     setComments(prev =>
       prev.map(c =>
-        c.messageId === id ? { ...c, message: text } : c
+        c.messageId === id
+          ? {
+              ...c,
+              message: text,
+              imageUrl: removeImage ? "" : c.imageUrl
+            }
+          : c
       )
     );
   };
@@ -69,6 +95,24 @@ export default function CommentsSection() {
     setComments(prev =>
       prev.filter(c => c.messageId !== id)
     );
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    setShowAiInput(false);
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+  };
+
+  const handleAiGenerate = () => {
+    console.log("AI prompt:", aiPrompt);
   };
 
   return (
@@ -90,12 +134,15 @@ export default function CommentsSection() {
               <div key={c.messageId} className="p-4">
                 <ContentCard
                   author={c.userName}
-                  content={c.message}
+                  content={c.message || ""}
                   createdAt={new Date(c.createdAt).toLocaleDateString()}
                   variant="comment"
+                  imageUrl={c.imageUrl} 
                   canEdit={c.userId === currentUser?.userId}
                   canDelete={c.userId === currentUser?.userId}
-                  onUpdate={(text) => handleUpdate(c.messageId, text)}
+                  onUpdate={(text, removeImage) =>
+                    handleUpdate(c.messageId, text, removeImage)
+                  }
                   onDelete={() => handleDelete(c.messageId)}
                 />
               </div>
@@ -104,21 +151,15 @@ export default function CommentsSection() {
         </div>
 
         <div className="p-4 flex flex-col sm:flex-row gap-3 items-center bg-[rgba(0,0,0,0.1)] rounded-b-xl">
-          <input 
-            type="text" 
-            placeholder="Write a comment..." 
+          <Input
             value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handlePostComment()}
-            className="flex-1 w-full bg-[#1a110b] text-(--color-text) placeholder-[#6b5c50] rounded-lg px-4 py-3 border border-(--color-border) outline-none focus:border-(--color-accent) transition-colors shadow-inner" 
+            onChange={setCommentText}
+            onImageChange={setImageFile}
+            onSubmit={handlePostComment}
+            onGenerateImage={(prompt) => {
+              console.log("IA prompt:", prompt);
+            }}
           />
-
-          <button 
-            onClick={handlePostComment}
-            className="w-full sm:w-auto bg-(--color-primary) hover:brightness-110 text-white font-semibold py-3 px-5 rounded-lg transition-all shadow-md whitespace-nowrap"
-          >
-            Post Comment
-          </button>
         </div>
 
       </div>
