@@ -94,3 +94,20 @@ export async function updateComment(id: number, message: string) {
 export async function deleteComment(id: number) {
   await axiosClient.delete(`/story-messages/${id}`);
 }
+
+export async function uploadImage(storyId: string, image: File) {
+  const formData = new FormData();
+  formData.append("file", image);
+
+  const { data } = await axiosClient.post(
+    `/stories/${storyId}/image`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    }
+  );
+
+  return data;
+}

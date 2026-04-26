@@ -2,16 +2,28 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-// https://vite.dev/config/
-export default defineConfig({
+import { defineConfig as defineVitestConfig } from 'vitest/config'
+
+export default defineVitestConfig({
   plugins: [react(), tailwindcss()],
+
   server: {
     proxy: {
       '/api': {
         target: 'https://localhost:7219',
         changeOrigin: true,
-        secure: false, // importante si usas HTTPS local
+        secure: false,
       },
     },
+  },
+
+  test: {
+    environment: 'jsdom',
+    exclude: [
+      'node_modules/**',
+      'tests/**',       // playwright
+      'dist/**',
+      'public/**'
+    ]
   }
 })

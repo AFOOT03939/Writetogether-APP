@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import SideCard from '../components/sideCard';
 import StoryCard from '../components/inputCard';
 import CommentsSection from '../components/commentSection';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { StoriesModel, StoriesModelRequest } from '../models/story.model';
-import { createStory, getStory, getUser, getUserRole } from '../api/story.api';
+import { createStory, getStory, getUser, getUserRole, uploadImage } from '../api/story.api';
 import type { User } from '../../../globals/models/user.model';
 
 export default function ReadStoryPage() {
@@ -28,6 +28,8 @@ export default function ReadStoryPage() {
   const [currentUser, setCurrentUser] = useState<User>();
   const navigate = useNavigate()
   const {storyId} = useParams();
+  const [imageFile, setImageFile] = useState<File | null>(null); 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -81,6 +83,12 @@ export default function ReadStoryPage() {
 
       if(isCreate){
         const res = await createStory(storyRequest)
+
+        //sube la imagen
+        if (imageFile) {
+          await uploadImage(res.storyId, imageFile);
+        }
+
         alert("insertado correctamente")
         navigate(`/story/${res.storyId}`);
       }
@@ -89,6 +97,17 @@ export default function ReadStoryPage() {
       console.log(err)
     }
   }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+
+    const file = e.target.files[0];
+    setImageFile(file);
+  };
+ 
+  const imageSrc = imageFile 
+  ? URL.createObjectURL(imageFile)  
+  : story.imageUrl 
 
   console.log(currentUser)
 
@@ -101,7 +120,7 @@ export default function ReadStoryPage() {
   useEffect(() => {
     setIsEditingTitle(isCreate);
   }, [isCreate]);
- 
+  
   return (
     <div className="bg-(--color-bg-main) min-h-screen text-(--color-text) font-sans flex flex-col">
       
@@ -121,77 +140,104 @@ export default function ReadStoryPage() {
           backgroundRepeat: 'repeat'
         }}
       >
-        <div className="max-w-300 w-full flex flex-col md:flex-row justify-between items-end gap-4 bg-[rgba(61,40,23,0.7)] p-6 rounded-xl backdrop-blur-sm border border-(--color-border)">
-          {/* Info principal de la historia */}
-          <div>
-              {isEditingTitle ? (
-              <input
-                type="text"
-                value={story.title || ""}
-                onChange={(e) =>
-                  setStory({ ...story, title: e.target.value })
-                }
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    setIsEditingTitle(false);
-                  }
-                }}
-                autoFocus
-                className="text-4xl md:text-5xl font-extrabold tracking-tight text-white bg-transparent border-b border-white outline-none mb-2"
-              />
-            ) : (
-              <h1
-                onClick={() => {
-                  if (canEdit) setIsEditingTitle(true);
-                }}
-                className="text-4xl md:text-5xl font-extrabold tracking-tight text-white drop-shadow-md mb-2 cursor-pointer"
-              >
-                {story.title || "Untitled"}
-              </h1>
-            )}
-
-            <div className="flex items-center gap-3 text-sm font-medium text-white/90">
-
-              {isCreate ? (
-                <span>Author: {currentUser?.userName}</span>
+        <div className="max-w-300 w-full flex flex-col md:flex-row justify-around items-center gap-4 bg-[rgba(61,40,23,0.7)] p-6 rounded-xl backdrop-blur-sm border border-(--color-border)">
+          {/* IMAGEN */}
+          <div className="flex items-center gap-10">
+            <div
+              onClick={() => fileInputRef.current?.click()} 
+              className="w-32 h-32 border-2 border-(--color-border) rounded-xl overflow-hidden bg-(--color-bg-secondary) flex items-center justify-center shadow-md">
+              
+              {story.imageUrl || imageFile ? (
+                <img
+                  src={imageSrc}
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                <span>Author: {story.authorName}</span>
+                <span className="text-xs text-gray-400">Upload an Image</span>
               )}
+              
+            </div>
 
-              <span className="text-white/50">|</span>
+            <input 
+              type='file'
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleImageChange}
+              >
+            </input>
 
-              {isCreate ? (
-              <>
-                <span>Status:</span>
-                <select 
-                  value={story.status || ""}
+            
+            {/* Info principal de la historia */}
+            <div className="">
+                {isEditingTitle ? (
+                <input
+                  type="text"
+                  value={story.title || ""}
                   onChange={(e) =>
-                    setStory({ ...story, status: e.target.value })
+                    setStory({ ...story, title: e.target.value })
                   }
-
-                  className="
-                  bg-(--color-bg-secondary)
-                  text-white
-                  p-1
-                  rounded-lg
-                  border border-(--color-border)
-                  outline-none
-                  cursor-pointer
-                  hover:bg-(--color-bg-card)
-                  transition
-                "
-              >
-                  <option value="active">active</option>
-                  <option value="finished">finished</option>
-                </select>
-              </>
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      setIsEditingTitle(false);
+                    }
+                  }}
+                  autoFocus
+                  className="text-4xl md:text-5xl font-extrabold tracking-tight text-white bg-transparent border-b border-white outline-none mb-2"
+                />
               ) : (
-                <span>Status: {story.status}</span>
+                <h1
+                  onClick={() => {
+                    if (canEdit) setIsEditingTitle(true);
+                  }}
+                  className="text-4xl md:text-5xl font-extrabold tracking-tight text-white drop-shadow-md mb-2 cursor-pointer"
+                >
+                  {story.title || "Untitled"}
+                </h1>
               )}
 
-              <span className="text-white/50">|</span>
-              <div className="flex text-(--color-accent)">
-                <span>★</span><span>★</span><span>★</span><span className="opacity-50">★</span><span className="opacity-50">★</span>
+              <div className="flex items-center gap-3 text-sm font-medium text-white/90">
+
+                {isCreate ? (
+                  <span>Author: {currentUser?.userName}</span>
+                ) : (
+                  <span>Author: {story.authorName}</span>
+                )}
+
+                <span className="text-white/50">|</span>
+
+                {isCreate ? (
+                <>
+                  <span>Status:</span>
+                  <select 
+                    value={story.status || ""}
+                    onChange={(e) =>
+                      setStory({ ...story, status: e.target.value })
+                    }
+
+                    className="
+                    bg-(--color-bg-secondary)
+                    text-white
+                    p-1
+                    rounded-lg
+                    border border-(--color-border)
+                    outline-none
+                    cursor-pointer
+                    hover:bg-(--color-bg-card)
+                    transition
+                  "
+                >
+                    <option value="active">active</option>
+                    <option value="finished">finished</option>
+                  </select>
+                </>
+                ) : (
+                  <span>Status: {story.status}</span>
+                )}
+
+                <span className="text-white/50">|</span>
+                <div className="flex text-(--color-accent)">
+                  <span>★</span><span>★</span><span>★</span><span className="opacity-50">★</span><span className="opacity-50">★</span>
+                </div>
               </div>
             </div>
           </div>
@@ -199,18 +245,8 @@ export default function ReadStoryPage() {
           {/* Botones de acción del header */}
           <div className="flex gap-3">
             <button
-              onClick={() => 
-                  {
-                    handleSave()
-                  }
-                }
-              className="px-5 py-2 rounded-lg bg-(--color-bg-secondary) border border-(--color-border) hover:bg-(--color-bg-card) transition font-medium text-sm shadow-md">
-              Save
-            </button>
-            <button className="px-5 py-2 rounded-lg bg-(--color-bg-secondary) border border-(--color-border) hover:bg-(--color-bg-card) transition font-medium text-sm shadow-md">
-              Upload Photo
-            </button>
-            <button className="px-6 py-2 rounded-lg bg-(--color-accent) text-(--color-bg-secondary) hover:brightness-110 transition font-bold text-sm shadow-md">
+              onClick={handleSave} 
+              className="px-6 py-2 rounded-lg bg-(--color-accent) text-(--color-bg-secondary) hover:brightness-110 transition font-bold text-sm shadow-md">
               Publish
             </button>
           </div>

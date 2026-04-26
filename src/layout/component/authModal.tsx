@@ -33,7 +33,6 @@ export default function AuthModal({ type, onClose, switchMode, setLogged }: Prop
         localStorage.setItem("token", res.token)
 
         setLogged(true);
-        setName(res.name)
     }
 
     const handleSubmitLogin = async (e: React.FormEvent) => {
