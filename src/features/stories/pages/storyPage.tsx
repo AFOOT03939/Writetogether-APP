@@ -4,7 +4,7 @@ import StoryCard from '../components/storyCard';
 import CommentsSection from '../components/commentSection';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { StoriesModel, StoriesModelRequest } from '../models/story.model';
-import { createStory, getStory, getUser, getUserRole, uploadImage } from '../api/story.api';
+import { createStory, getStory, getUser, getUserRole, joinStory, leaveStory, updateStory, uploadImage } from '../api/story.api';
 import type { User } from '../../../globals/models/user.model';
 
 export default function ReadStoryPage() {
@@ -30,6 +30,9 @@ export default function ReadStoryPage() {
   const {storyId} = useParams();
   const [imageFile, setImageFile] = useState<File | null>(null); 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [role, setRole] = useState<"creator" | "editor" | "viewer">("viewer");
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const isFinished = story.status === "finished";
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -44,9 +47,11 @@ export default function ReadStoryPage() {
   useEffect(() => {
     if (!storyId) return;
 
+    setRole("viewer");
+    setShowJoinModal(false);
+
     const fetchStory = async () => {
       const currentStory = await getStory(storyId);
-      console.log(currentStory);
       const parsedStory = {
         ...currentStory,
         categoryIds: currentStory.categoryIds
@@ -57,9 +62,13 @@ export default function ReadStoryPage() {
     };
 
     const fetchRole = async () => {
-      const userRole = await getUserRole(storyId);
-      console.log(userRole);
-      setIsCollaborator(userRole)
+      const res = await getUserRole(storyId);
+
+      setRole(res.role);
+
+      if (res.role === "viewer") {
+        setShowJoinModal(true);
+      }
     };
 
     fetchStory();
@@ -98,6 +107,24 @@ export default function ReadStoryPage() {
     }
   }
 
+  const handleJoin = async () => {
+    if (!storyId) return;
+
+    await joinStory(storyId);
+
+    setRole("editor");
+    setShowJoinModal(false);
+    
+  };
+
+  const handleLeave = async () => {
+    if (!storyId) return;
+
+    await leaveStory(storyId);
+
+    setRole("viewer");
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
@@ -113,15 +140,52 @@ export default function ReadStoryPage() {
 
   const isCreate = !storyId;
   const isCreator = story.userId === currentUser?.userId;
-  const canEdit = isCreate || isCreator || isCollaborator;
+  const canEdit = (isCreate || isCreator || role === "editor") && !isFinished;
 
   const [isEditingTitle, setIsEditingTitle] = useState(isCreate);
 
   useEffect(() => {
     setIsEditingTitle(isCreate);
   }, [isCreate]);
+
+  const handleStatusChange = async (newStatus: "active" | "finished") => {
+    if (!storyId) return;
+
+    await updateStory(storyId, newStatus);
+
+    setStory(prev => ({ ...prev, status: newStatus }));
+  };
   
   return (
+    <>
+    {showJoinModal && role === "viewer" && (
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+        <div className="bg-[#1a110b] p-6 rounded-lg text-center">
+
+          <h2 className="text-white font-bold mb-2">
+            Join as collaborator?
+          </h2>
+
+          <div className="flex gap-2 justify-center mt-4">
+            <button
+              onClick={handleJoin}
+              className="bg-orange-600 px-4 py-2 rounded text-white"
+            >
+              Join
+            </button>
+
+            <button
+              onClick={() => setShowJoinModal(false)}
+              className="bg-gray-600 px-4 py-2 rounded text-white"
+            >
+              Cancel
+            </button>
+          </div>
+
+        </div>
+      </div>
+    )}
+    
     <div className="bg-(--color-bg-main) min-h-screen text-(--color-text) font-sans flex flex-col">
       
       {/* HERO */}
@@ -235,6 +299,17 @@ export default function ReadStoryPage() {
                 )}
 
                 <span className="text-white/50">|</span>
+
+                {role === "editor" && (
+                  <button
+                    onClick={handleLeave}
+                    className="px-4 py-2 bg-red-600 text-white rounded"
+                  >
+                    Leave Story
+                  </button>
+                )}
+
+                <span className="text-white/50">|</span>
                 <div className="flex text-(--color-accent)">
                   <span>★</span><span>★</span><span>★</span><span className="opacity-50">★</span><span className="opacity-50">★</span>
                 </div>
@@ -244,11 +319,27 @@ export default function ReadStoryPage() {
 
           {/* Botones de acción del header */}
           <div className="flex gap-3">
-            <button
-              onClick={handleSave} 
-              className="px-6 py-2 rounded-lg bg-(--color-accent) text-(--color-bg-secondary) hover:brightness-110 transition font-bold text-sm shadow-md">
-              Publish
-            </button>
+            <div className="flex gap-3">
+
+              {!isCreate && isCreator && !isFinished && (
+                <button
+                  onClick={() => handleStatusChange("finished")}
+                  className="px-6 py-2 rounded-lg bg-red-600 text-white hover:brightness-110 transition font-bold text-sm shadow-md"
+                >
+                  Finish Story
+                </button>
+              )}
+
+              {!isCreate && isCreator && isFinished && (
+                <button
+                  onClick={() => handleStatusChange("active")}
+                  className="px-6 py-2 rounded-lg bg-green-600 text-white hover:brightness-110 transition font-bold text-sm shadow-md"
+                >
+                  Activate Story
+                </button>
+              )}
+
+            </div>
           </div>
         </div>
       </header>
@@ -256,7 +347,7 @@ export default function ReadStoryPage() {
       {/* CONTENEDOR PRINCIPAL  */}
       <main className="flex-1 w-full max-w-350 mx-auto p-4 md:p-8 flex flex-col md:flex-row gap-8 items-start">
       
-        <div className="w-full md:w-80 shrink-0 md:sticky md:top-40 md:max-h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar">
+        <div className="w-full md:w-80 shrink-0 md:sticky md:top-52 md:max-h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar">
             <SideCard
               story={story}
               setStory={setStory}
@@ -265,11 +356,16 @@ export default function ReadStoryPage() {
 
         {/* COMMENTS & STORIES */}
         <div className="flex-1 w-full flex flex-col min-w-0">
-            <StoryCard />
+            <StoryCard 
+            isFinished={isFinished}
+            role={role}
+            isCreator={isCreator}
+            />
             <CommentsSection />
         </div>
 
       </main>
     </div>
+    </>
   );
 }

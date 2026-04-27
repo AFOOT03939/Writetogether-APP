@@ -6,7 +6,8 @@ export interface Story {
   visibility?: string;
   imageUrl?: string;
   createdAt?: string;
-
+  category?: string;
+  categoryIds: number[];
   authorName?: string;
   rating?: number;
 }

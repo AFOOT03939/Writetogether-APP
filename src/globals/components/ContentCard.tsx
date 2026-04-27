@@ -14,6 +14,7 @@ interface Props {
 
   onUpdate?: (newText: string, removeImage?: boolean) => void;
   onDelete?: () => void;
+  onAiGenerate?: (prompt: string) => Promise<string>;
 }
 
 export default function ContentCard({
@@ -25,13 +26,16 @@ export default function ContentCard({
   canDelete = false,
   variant = "fragment",
   onUpdate,
-  onDelete
+  onDelete,
+  onAiGenerate
 }: Props) {
 
   const [isEditing, setIsEditing] = useState(false);
   const [text, setText] = useState(content);
   const [removeImage, setRemoveImage] = useState(false);
   const isOnlyImage = !content?.trim() && imageUrl;
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [isLoadingAi, setIsLoadingAi] = useState(false);
 
   const handleSave = () => {
     onUpdate?.(text, removeImage);
@@ -47,6 +51,24 @@ export default function ContentCard({
   const styles = {
     fragment: "bg-[#0f0b08] border-orange-900/40",
     comment: "bg-[#1a120c] border-orange-800/30"
+  };
+
+  const handleAiGenerate = async () => {
+    if (!aiPrompt.trim() || !onAiGenerate) return;
+
+    try {
+      setIsLoadingAi(true);
+
+      const result = await onAiGenerate(aiPrompt);
+
+      setText(result);
+
+      setAiPrompt("");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoadingAi(false);
+    }
   };
 
   return (
@@ -76,38 +98,50 @@ export default function ContentCard({
       ) : (
         <div className="flex flex-col gap-3">
 
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            autoFocus
-            className="w-full bg-[#1a0f08] text-orange-100 border border-orange-800 rounded-lg p-3 outline-none focus:border-orange-500 transition resize-none"
-            rows={4}
-          />
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          autoFocus
+          className="w-full bg-[#1a0f08] text-orange-100 border border-orange-800 rounded-lg p-3 outline-none focus:border-orange-500 transition resize-none"
+          rows={4}
+        />
 
-          {/* Imagen editable */}
-          {imageUrl && !removeImage && (
-            <div className="relative w-fit">
-              <img 
-                src={imageUrl} 
-                className="max-h-60 rounded-lg border border-orange-900/30"
-              />
-              <button
-                onClick={() => setRemoveImage(true)}
-                className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-500 text-white w-6 h-6 rounded-full text-xs"
-              >
-                ✕
-              </button>
-            </div>
-          )}
+        {/* ✨ AI CORRECTION INLINE */}
+        {onAiGenerate && (
+          <div className="flex gap-2">
+            <input
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="Fix grammar, improve style..."
+              className="flex-1 bg-[#1a110b] border border-orange-800 px-2 py-1 rounded text-sm text-orange-100"
+            />
 
-          {/* Indicador de eliminación */}
-          {removeImage && (
-            <span className="text-red-400 text-xs">
-              Image will be removed
-            </span>
-          )}
-          
-        </div>
+            <button
+              onClick={handleAiGenerate}
+              className="bg-purple-600 hover:bg-purple-500 text-white px-3 rounded text-sm"
+            >
+              {isLoadingAi ? "..." : "✨"}
+            </button>
+          </div>
+        )}
+
+        {/* Imagen editable (igual que ya tienes) */}
+        {imageUrl && !removeImage && (
+          <div className="relative w-fit">
+            <img 
+              src={imageUrl} 
+              className="max-h-60 rounded-lg border border-orange-900/30"
+            />
+            <button
+              onClick={() => setRemoveImage(true)}
+              className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-500 text-white w-6 h-6 rounded-full text-xs"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+      </div>
       )}
 
       {/* ACTIONS */}

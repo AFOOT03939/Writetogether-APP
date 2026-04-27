@@ -5,6 +5,7 @@ import { getStories } from "../api/category.api";
 import StoryCard from "../../../globals/components/storyCard";
 import { getCategories } from "../../../globals/api/api";
 import type { Category } from "../../../globals/models/category.model";
+import { useNavigate } from "react-router-dom";
 
 export default function CategoryPage() {
     const [stories, setStories] = useState<Story[]>([]);
@@ -13,6 +14,7 @@ export default function CategoryPage() {
 
     const [selectedStatus, setSelectedStatus] = useState<string>("active");
     const [selectedCategory, setSelectedCategory] = useState<number>();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadCategoryStories = async () => {
@@ -104,7 +106,7 @@ export default function CategoryPage() {
                 </p>
             ) : (
                 stories.map((story) => (
-                <StoryCard key={story.storyId} story={story} />
+                <StoryCard key={story.storyId} onClick={() => navigate(`/story/${story.storyId}`)} story={story} />
                 ))
             )}
             </div>

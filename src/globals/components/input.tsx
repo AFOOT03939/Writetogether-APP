@@ -6,6 +6,7 @@ interface Props {
   onSubmit: () => void;
   onImageChange: (file: File | null) => void;
   onGenerateImage: (prompt: string) => void;
+  imagePreview?: string | null;
 }
 
 export default function Input({
@@ -13,12 +14,12 @@ export default function Input({
   onChange,
   onSubmit,
   onImageChange,
-  onGenerateImage
+  onGenerateImage,
+  imagePreview
 }: Props) {
 
   const fileRef = useRef<HTMLInputElement | null>(null);
 
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showAi, setShowAi] = useState(false);
   const [prompt, setPrompt] = useState("");
 
@@ -26,14 +27,16 @@ export default function Input({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setImagePreview(URL.createObjectURL(file));
-    onImageChange(file);
+    onImageChange(file); 
     setShowAi(false);
   };
 
   const removeImage = () => {
-    setImagePreview(null);
     onImageChange(null);
+
+    if (fileRef.current) {
+      fileRef.current.value = "";
+    }
   };
 
   const handleGenerate = () => {
@@ -75,18 +78,17 @@ export default function Input({
 
       </div>
 
-      {/* PREVIEW */}
       {imagePreview && (
-        <div className="relative w-fit">
-          <img src={imagePreview} className="h-28 rounded-md" />
-          <button
-            onClick={removeImage}
-            className="absolute -top-2 -right-2 bg-red-600 w-5 h-5 text-xs rounded-full"
-          >
-            ✕
-          </button>
-        </div>
-      )}
+      <div className="relative w-fit">
+        <img src={imagePreview} className="h-28 rounded-md" />
+        <button
+          onClick={removeImage}
+          className="absolute -top-2 -right-2 bg-red-600 w-5 h-5 text-xs rounded-full"
+        >
+          ✕
+        </button>
+      </div>
+    )}
 
       {/* AI INPUT */}
       {showAi && (

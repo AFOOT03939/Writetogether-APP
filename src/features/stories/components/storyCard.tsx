@@ -1,10 +1,17 @@
 import { useEffect, useState } from 'react';
-import { createFragment, deleteFragment, getFragments, getUser, updateFragment, uploadImageFragments } from '../api/story.api';
+import { createFragment, deleteFragment, generateText, getFragments, getUser, updateFragment, uploadImageFragments } from '../api/story.api';
 import type { Fragment } from '../models/fragments.model';
 import { useParams } from 'react-router-dom';
 import ContentCard from '../../../globals/components/ContentCard';
+import { buildCorrectionPrompt } from '../../../globals/utils/aiPrompt';
 
-export default function StoryCard() {
+interface Props {
+  isFinished: boolean;
+  role: "creator" | "editor" | "viewer";
+  isCreator: boolean;
+}
+
+export default function StoryCard({ isFinished, role, isCreator }: Props) {
   const [fragments, setFragments] = useState<Fragment[]>([]);
   const [newFragment, setNewFragment] = useState("");
   const [currentUser, setCurrentUser] = useState<any>();
@@ -16,6 +23,8 @@ export default function StoryCard() {
   const [aiPrompt, setAiPrompt] = useState("");
 
   const { storyId } = useParams();
+
+  const canWrite = (role === "editor" || isCreator) && !isFinished;
 
   useEffect(() => {
     if (!storyId) return;
@@ -102,6 +111,8 @@ export default function StoryCard() {
     );
   };
 
+  
+
   return (
     <div className="bg-(--color-bg-card) rounded-xl border border-(--color-border) shadow-2xl flex flex-col w-full">
 
@@ -119,18 +130,34 @@ export default function StoryCard() {
                 content={f.content}
                 createdAt={new Date(f.createdAt).toLocaleDateString()}
                 variant="fragment"
-                imageUrl={f.imageUrl} // FIX: ahora sí se renderiza
+                imageUrl={f.imageUrl} 
                 canEdit={f.userId === currentUser?.userId}
                 canDelete={f.userId === currentUser?.userId}
                 onUpdate={(text) => handleUpdate(f.fragmentId, text)}
                 onDelete={() => handleDelete(f.fragmentId)}
+                onAiGenerate={async (instruction) => {
+                  const fullContext = fragments
+                    .map(frag => frag.content)
+                    .filter(Boolean)
+                    .join("\n\n");
+
+                  const prompt = buildCorrectionPrompt({
+                    currentText: f.content || "",
+                    fullContext,
+                    instruction
+                  });
+
+                  const res = await generateText(f.fragmentId, prompt);
+
+                  return res;
+                }}
               />
             </div>
           ))
         )}
       </div>
 
-      {/* INPUT */}
+      {canWrite && (
       <div className="p-6 border-t border-(--color-border) bg-[rgba(0,0,0,0.1)] rounded-b-xl">
         <h3 className="text-white font-bold text-lg mb-4">
           Write next fragment
@@ -178,13 +205,11 @@ export default function StoryCard() {
             <button className="bg-(--color-primary) hover:brightness-110 text-white font-semibold py-2 px-4 rounded-lg transition-all shadow-md text-sm">
               AI Correction
             </button>
-            <button className="bg-(--color-primary) hover:brightness-110 text-white font-semibold py-2 px-4 rounded-lg transition-all shadow-md text-sm">
-              Improve text
-            </button>
           </div>
-
+            
         </div>
       </div>
+      )}
     </div>
   );
 }

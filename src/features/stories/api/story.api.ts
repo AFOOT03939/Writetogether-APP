@@ -147,4 +147,23 @@ export async function uploadImageMessage(messageId: string, image: File) {
   return data;
 }
 
+export async function generateImageAI(prompt: string) {
+  const { data } = await axiosClient.post(`/ai/generate-image`, {
+    prompt
+  });
 
+  return data;
+}
+
+export async function generateText(fragmentId: number, prompt: string) {
+  const { data } = await axiosClient.post(`/ai-text/generate`, {
+    fragmentId,
+    prompt
+  });
+
+  return data.content;
+}
+
+export async function updateStory(id: string, status: string) {
+  await axiosClient.put(`/stories/status/${id}`, status);
+}

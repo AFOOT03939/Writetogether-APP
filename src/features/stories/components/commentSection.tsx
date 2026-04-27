@@ -12,18 +12,22 @@ import {
 
 import type { Comment } from "../../stories/models/comments.model";
 import Input from '../../../globals/components/input';
+import { useAiImage } from '../../../globals/hooks/useAiImage';
 
 export default function CommentsSection() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState("");
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-
-  const [showAiInput, setShowAiInput] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState("");
 
   const { storyId } = useParams();
+
+  const {
+    imageFile,
+    imagePreview,
+    generate,
+    clear,
+    setImageFile
+  } = useAiImage();
 
   useEffect(() => {
     if (!storyId) return;
@@ -70,7 +74,7 @@ export default function CommentsSection() {
   setComments(prev => [...prev, newItem]);
 
   setCommentText("");
-  handleRemoveImage();
+  clear();
 };
 
   const handleUpdate = async (id: number, text: string, removeImage?: boolean) => {
@@ -95,24 +99,6 @@ export default function CommentsSection() {
     setComments(prev =>
       prev.filter(c => c.messageId !== id)
     );
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-    setShowAiInput(false);
-  };
-
-  const handleRemoveImage = () => {
-    setImageFile(null);
-    setImagePreview(null);
-  };
-
-  const handleAiGenerate = () => {
-    console.log("AI prompt:", aiPrompt);
   };
 
   return (
@@ -156,9 +142,8 @@ export default function CommentsSection() {
             onChange={setCommentText}
             onImageChange={setImageFile}
             onSubmit={handlePostComment}
-            onGenerateImage={(prompt) => {
-              console.log("IA prompt:", prompt);
-            }}
+            onGenerateImage={generate}
+            imagePreview={imagePreview}
           />
         </div>
 
