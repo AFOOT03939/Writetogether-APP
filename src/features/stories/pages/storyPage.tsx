@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import SideCard from '../components/sideCard';
 import StoryCard from '../components/storyCard';
 import CommentsSection from '../components/commentSection';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import type { StoriesModel } from '../models/story.model';
-import { getStory, getUser, getUserRole, joinStory, leaveStory, updateStory } from '../api/story.api';
+import { getStory, getUser, getUserRole, joinStory, leaveStory, updateStory, createStory, uploadImage } from '../api/story.api';
 import type { User } from '../../../globals/models/user.model';
 
 export default function ReadStoryPage() {
@@ -26,6 +26,31 @@ export default function ReadStoryPage() {
 
   const [currentUser, setCurrentUser] = useState<User>();
   const {storyId} = useParams();
+  const navigate = useNavigate();
+
+  const handleSaveNewStory = async () => {
+    try {
+      const res = await createStory({
+        title: story.title || "Untitled",
+        description: story.description,
+        userId: currentUser?.id || 0,
+        visibility: story.visibility || "public",
+        status: story.status || "active",
+        categoryIds: story.categoryIds || [],
+        imageUrl: story.imageUrl
+      });
+
+      if (res.storyId && imageFile) {
+        await uploadImage(res.storyId.toString(), imageFile);
+      }
+
+      if (res.storyId) {
+        navigate(`/story/${res.storyId}`);
+      }
+    } catch (error) {
+      console.error("Failed to create story", error);
+    }
+  };
   const [imageFile, setImageFile] = useState<File | null>(null); 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [role, setRole] = useState<"creator" | "editor" | "viewer">("viewer");
@@ -302,6 +327,15 @@ export default function ReadStoryPage() {
                   className="px-6 py-2 rounded-lg bg-green-600 text-white hover:brightness-110 transition font-bold text-sm shadow-md"
                 >
                   Activate Story
+                </button>
+              )}
+
+              {isCreate && (
+                <button
+                  onClick={handleSaveNewStory}
+                  className="px-6 py-2 rounded-lg bg-green-600 text-white hover:brightness-110 transition font-bold text-sm shadow-md"
+                >
+                  Create Story
                 </button>
               )}
 
