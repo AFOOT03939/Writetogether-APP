@@ -33,7 +33,7 @@ export default function ReadStoryPage() {
       const res = await createStory({
         title: story.title || "Untitled",
         description: story.description,
-        userId: currentUser?.id || 0,
+        userId: currentUser?.userId || 0,
         visibility: story.visibility || "public",
         status: story.status || "active",
         categoryIds: story.categoryIds || [],
