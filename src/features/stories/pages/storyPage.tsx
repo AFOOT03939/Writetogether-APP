@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import SideCard from '../components/sideCard';
 import StoryCard from '../components/storyCard';
 import CommentsSection from '../components/commentSection';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import type { StoriesModel } from '../models/story.model';
 import { getStory, getUser, getUserRole, joinStory, leaveStory, updateStory } from '../api/story.api';
 import type { User } from '../../../globals/models/user.model';
@@ -25,7 +25,6 @@ export default function ReadStoryPage() {
   });
 
   const [currentUser, setCurrentUser] = useState<User>();
-  const navigate = useNavigate()
   const {storyId} = useParams();
   const [imageFile, setImageFile] = useState<File | null>(null); 
   const fileInputRef = useRef<HTMLInputElement | null>(null);

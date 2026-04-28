@@ -92,7 +92,7 @@ export default function ProfilePage() {
                 
                 <div className="relative">
                     <div className="w-36 h-36 rounded-full bg-(--color-bg-input) overflow-hidden flex items-center justify-center border-4 border-(--color-border) text-5xl">
-                    <img className="w-full h-full object-cover" src={`https://localhost:7219${users?.imageUrl}`} alt="Profile" />
+                    <img className="w-full h-full object-cover" src={`${import.meta.env.VITE_API_URL || 'https://localhost:7219'}${users?.imageUrl}`} alt="Profile" />
                     </div>
                 </div>
 
