@@ -1,6 +1,4 @@
 import { useEffect, useState, type MouseEventHandler } from "react";
-import { getCategories } from "../../globals/api/api";
-import type { Category } from "../../globals/models/category.model";
 import { useNavigate } from "react-router-dom";
 import type { User } from "../../globals/models/user.model";
 import { getUser } from "../../features/stories/api/story.api";
@@ -13,7 +11,6 @@ interface Props{
 
 export default function Navbar({ onLogin, onSignup, isLogged}: Props) {
 
-  const [categories, setCategories] = useState<Category[]>([]);
   const [name, setName] = useState<User>();
   const navigate = useNavigate();
 
@@ -29,19 +26,6 @@ export default function Navbar({ onLogin, onSignup, isLogged}: Props) {
 
     if (isLogged) fetchUser();
   }, [isLogged]);
-
-  useEffect(() => {
-    const loadStories = async () => {
-      try{
-          const category = await getCategories();
-          setCategories(category)
-      }catch(err){
-        console.log("Error en get de Stories", err)
-      }
-    };
-
-    loadStories();
-  }, []);
 
   const logout = async () => {
         localStorage.removeItem("token")

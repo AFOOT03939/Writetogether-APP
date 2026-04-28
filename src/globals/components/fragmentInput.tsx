@@ -1,35 +1,14 @@
 import { useRef, useState } from "react";
 
-interface Props {
-  initialText?: string;
-  onSubmit: (text: string, image: File | null, aiPrompt: string) => void;
-  submitLabel?: string;
-}
+interface Props {}
 
-export default function FragmentInput({
-  initialText = "",
-  onSubmit,
-  submitLabel = "Submit"
-}: Props) {
+export default function FragmentInput({}: Props) {
 
-  const [text, setText] = useState(initialText);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [aiPrompt, setAiPrompt] = useState("");
   const [showAIPrompt, setShowAIPrompt] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  const handleSubmit = () => {
-    if (!text.trim()) return;
-
-    onSubmit(text, imageFile, aiPrompt);
-
-    // reset
-    setText("");
-    setImageFile(null);
-    setAiPrompt("");
-    setShowAIPrompt(false);
-  };
 
   return (
     <div className="flex items-center gap-2 mt-2 flex-wrap">
@@ -57,7 +36,7 @@ export default function FragmentInput({
   {/* IA IMAGE */}
   <button
     onClick={() => setShowAIPrompt(prev => !prev)}
-    className="flex items-center gap-1 px-2 py-1 text-xs border border-(--color-border) rounded-md hover:bg-[#2a1b12]"
+    className={`flex items-center gap-1 px-2 py-1 text-xs border border-(--color-border) rounded-md hover:bg-[#2a1b12] ${showAIPrompt ? 'bg-[#2a1b12]' : ''}`}
   >
     🤖 <span className="hidden sm:inline">AI Image</span>
   </button>

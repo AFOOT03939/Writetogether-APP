@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { StoriesCollaboratorsModel, StoriesModel } from '../models/story.model';
 import CategoryItem from './categoryItem';
-import TagItem from './tagItem';
 import { getCollaborators } from '../api/story.api';
 import { useParams } from 'react-router-dom';
 
@@ -12,7 +11,6 @@ interface props{
 
 export default function SideCard({story, setStory}: props) {
 
-  const [tagInput, setTagInput] = useState("");
   const [collaborators, setCollaborators] = useState<StoriesCollaboratorsModel[]>([])
 
   const categories = [
@@ -29,21 +27,6 @@ export default function SideCard({story, setStory}: props) {
   ];
 
   const {storyId} = useParams();
-
-  const handleAddTag = () => {
-    const newTag = tagInput.trim();
-
-    if (!newTag) return;
-
-    setStory(prev => ({
-      ...prev,
-      tags: prev.tags.includes(newTag)
-        ? prev.tags
-        : [...prev.tags, newTag]
-    }));
-
-    setTagInput("");
-  };
 
   useEffect(() => {
     if(!storyId) return;

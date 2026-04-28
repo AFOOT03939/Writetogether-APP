@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import StoryCard from "../../../globals/components/storyCard";
 import type { Story } from "../../../globals/models/storyCard.model";
-import { changePhoto, editCharacter, getFragments, getImage, getUsers} from "../api/profile.api";
+import { changePhoto, editCharacter, getFragments, getUsers} from "../api/profile.api";
 import type { User } from "../../../layout/models/user.model";
 import { getStories } from "../../mainPage/api/main.api";
 import type { Fragment } from "../../../layout/models/fragment.model";

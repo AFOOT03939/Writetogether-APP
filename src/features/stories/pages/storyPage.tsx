@@ -3,8 +3,8 @@ import SideCard from '../components/sideCard';
 import StoryCard from '../components/storyCard';
 import CommentsSection from '../components/commentSection';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { StoriesModel, StoriesModelRequest } from '../models/story.model';
-import { createStory, getStory, getUser, getUserRole, joinStory, leaveStory, updateStory, uploadImage } from '../api/story.api';
+import type { StoriesModel } from '../models/story.model';
+import { getStory, getUser, getUserRole, joinStory, leaveStory, updateStory } from '../api/story.api';
 import type { User } from '../../../globals/models/user.model';
 
 export default function ReadStoryPage() {
@@ -24,7 +24,6 @@ export default function ReadStoryPage() {
     tags: [] 
   });
 
-  const [isCollaborator, setIsCollaborator] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
   const navigate = useNavigate()
   const {storyId} = useParams();
@@ -74,38 +73,6 @@ export default function ReadStoryPage() {
     fetchStory();
     fetchRole();
   }, [storyId]);
-
-  const handleSave = async () => {
-    try{
-
-      if (!currentUser) return;
-      console.log("request", story)
-      const storyRequest: StoriesModelRequest = {
-        title: story.title,
-        description: story.description,
-        userId: currentUser.userId, 
-        status: story.status,
-        visibility: "public",
-        imageUrl: story.imageUrl,
-        categoryIds: story.categoryIds
-      };
-
-      if(isCreate){
-        const res = await createStory(storyRequest)
-
-        //sube la imagen
-        if (imageFile) {
-          await uploadImage(res.storyId, imageFile);
-        }
-
-        alert("insertado correctamente")
-        navigate(`/story/${res.storyId}`);
-      }
-
-    }catch(err){
-      console.log(err)
-    }
-  }
 
   const handleJoin = async () => {
     if (!storyId) return;
