@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api', // usa la variable de entorno o el proxy en dev
+  baseURL: (import.meta.env.VITE_API_URL || '') + '/api', // usa la variable de entorno o vacío y añade /api
   headers: {
     'Content-Type': 'application/json',
   },
