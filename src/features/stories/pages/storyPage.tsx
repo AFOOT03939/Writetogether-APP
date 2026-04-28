@@ -301,17 +301,37 @@ export default function ReadStoryPage() {
                 <span className="text-white/50">|</span>
 
                 {role === "editor" && (
+                  <>
                   <button
                     onClick={handleLeave}
                     className="px-4 py-2 bg-red-600 text-white rounded"
                   >
                     Leave Story
                   </button>
+                  
+                  <span className="text-white/50">|</span>
+                  </>
                 )}
 
-                <span className="text-white/50">|</span>
-                <div className="flex text-(--color-accent)">
-                  <span>★</span><span>★</span><span>★</span><span className="opacity-50">★</span><span className="opacity-50">★</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex text-(--color-accent)">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span
+                        key={star}
+                        className={
+                          star <= Math.round(story.rating)
+                            ? ""
+                            : "opacity-30"
+                        }
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+
+                  <span className="text-xs text-white/70">
+                    {story.rating > 0 ? story.rating.toFixed(1) : "No ratings"}
+                  </span>
                 </div>
               </div>
             </div>

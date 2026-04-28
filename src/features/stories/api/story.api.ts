@@ -1,4 +1,5 @@
 import axiosClient from "../../../api/axiosClient"
+import type { RatingModel } from "../models/rates.model"
 import type { StoriesModel, StoriesModelRequest } from "../models/story.model"
 
 export async function getUser(){
@@ -166,4 +167,29 @@ export async function generateText(fragmentId: number, prompt: string) {
 
 export async function updateStory(id: string, status: string) {
   await axiosClient.put(`/stories/status/${id}`, status);
+}
+
+export async function createRating(rating: RatingModel) {
+  const { data } = await axiosClient.post(
+    `/ratings`,
+    rating
+  );
+
+  return data;
+}
+
+export async function getStoryRating(storyId: string) {
+  const { data } = await axiosClient.get(
+    `/ratings/stories/${storyId}`
+  );
+
+  return data as number;
+}
+
+export async function getUserStoryRating(storyId: string, userId: number) {
+  const { data } = await axiosClient.get(
+    `/ratings/stories/${storyId}/users/${userId}`
+  );
+
+  return data as number | null;
 }

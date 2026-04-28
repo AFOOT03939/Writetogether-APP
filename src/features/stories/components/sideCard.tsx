@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import type { StoriesCollaboratorsModel, StoriesModel } from '../models/story.model';
 import CategoryItem from './categoryItem';
 import TagItem from './tagItem';
-import { getCollaborators } from '../api/story.api';
+import { createRating, getCollaborators, getStoryRating, getUser, getUserStoryRating } from '../api/story.api';
 import { useParams } from 'react-router-dom';
+import type { RatingModel } from '../models/rates.model';
 
 interface props{
   story: StoriesModel;
@@ -13,7 +14,9 @@ interface props{
 export default function SideCard({story, setStory}: props) {
 
   const [tagInput, setTagInput] = useState("");
-  const [collaborators, setCollaborators] = useState<StoriesCollaboratorsModel[]>([])
+  const [collaborators, setCollaborators] = useState<StoriesCollaboratorsModel[]>([]);
+  const [userRating, setUserRating] = useState<number>(0);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   const categories = [
     { id: 1, name: "Fantasy" },
@@ -56,6 +59,60 @@ export default function SideCard({story, setStory}: props) {
 
       fetchCollaborators();
     }, [storyId]);
+
+  const handleRate = async (value: number) => {
+    if (!storyId || !currentUserId) return;
+
+    try {
+      setUserRating(value);
+
+      await createRating({
+        storyId: Number(storyId),
+        rating: value
+      });
+
+      // refrescar promedio
+      const newAvg = await getStoryRating(storyId);
+
+      setStory(prev => ({
+        ...prev,
+        rating: newAvg ?? 0
+      }));
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (!storyId) return;
+
+    const fetchData = async () => {
+      try {
+        const user = await getUser();
+        setCurrentUserId(user.userId);
+
+        const [avg, myRating] = await Promise.all([
+          getStoryRating(storyId),
+          getUserStoryRating(storyId, user.userId)
+        ]);
+
+        setStory(prev => ({
+          ...prev,
+          rating: avg ?? 0
+        }));
+
+        if (myRating) {
+          setUserRating(myRating);
+        }
+
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchData();
+  }, [storyId]);
 
   return (
     <div className="bg-(--color-bg-card) rounded-2xl p-6 border border-(--color-border) shadow-xl flex flex-col gap-6 w-full text-(--color-text)">
@@ -128,19 +185,26 @@ export default function SideCard({story, setStory}: props) {
       </div>
 
       {/* STORY RATING */}
-      <div>
-        <h3 className="font-medium text-(--color-text) mb-2">Story rating</h3>
-        <div className="flex gap-1 text-(--color-text-muted) text-xl mb-1">
-          <span>☆</span>
-          <span>☆</span>
-          <span>☆</span>
-          <span>☆</span>
-          <span>☆</span>
-        </div>
-        <p className="text-sm text-(--color-text-muted)">
-          Be the first to rate this story!
-        </p>
+      <div className="flex gap-1 text-xl mb-1 cursor-pointer">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            onClick={() => handleRate(star)}
+            className={
+              star <= userRating
+                ? "text-yellow-400"
+                : "text-(--color-text-muted)"
+            }
+          >
+            ★
+          </span>
+        ))}
       </div>
+      <p className="text-sm text-(--color-text-muted)">
+        {story.rating > 0
+          ? `Average rating: ${story.rating.toFixed(1)}`
+          : "Be the first to rate this story!"}
+      </p>
 
     </div>
   );
