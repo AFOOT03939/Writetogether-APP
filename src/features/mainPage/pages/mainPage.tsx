@@ -3,10 +3,12 @@ import "../css/mainpage.css"
 import type { Story } from "../../../globals/models/storyCard.model";
 import { getStories } from "../api/main.api";
 import StoryCard from "../../../globals/components/storyCard";
+import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
 
   const [stories, setStories] = useState<Story[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadStories = async () => {
@@ -60,7 +62,7 @@ export default function HomePage() {
       <section className="stories-section">
         <div className="stories-grid">
         {stories.slice(0, 10).map((story) => (
-          <StoryCard key={story.storyId} story={story} />
+          <StoryCard key={story.storyId} story={story} onClick={() => navigate(`/story/${story.storyId}`)} />
         ))}
         </div>
       </section>

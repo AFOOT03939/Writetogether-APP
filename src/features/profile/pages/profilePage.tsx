@@ -5,6 +5,9 @@ import { changePhoto, editCharacter, getFragments, getImage, getUsers} from "../
 import type { User } from "../../../layout/models/user.model";
 import { getStories } from "../../mainPage/api/main.api";
 import type { Fragment } from "../../../layout/models/fragment.model";
+import ContentCard from "../../../globals/components/ContentCard";
+import UserFragmentCard from "../components/userFragmentcard";
+import { useNavigate } from "react-router-dom";
 
 
 // Iconos
@@ -20,6 +23,12 @@ export default function ProfilePage() {
     const [fragments, setFragments] = useState<Fragment[]>([]);
     const [isEditingName, setIsEditingName] = useState(false);
     const [userName, setUserName] = useState<string>("");
+
+    const navigate = useNavigate();
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const CARD_WIDTH = 300 + 24;
+    const VISIBLE = 3;
 
     useEffect(() => {
         const loadData = async () => {
@@ -41,6 +50,18 @@ export default function ProfilePage() {
             };
         loadData();
     }, []);
+
+    const next = () => {
+      if (currentIndex < stories.length - VISIBLE) {
+        setCurrentIndex((prev) => prev + 1);
+      }
+    };
+
+    const prev = () => {
+      if (currentIndex > 0) {
+        setCurrentIndex((prev) => prev - 1);
+      }
+    };
 
     const handleSaveName = async () => {
     try {
@@ -73,6 +94,9 @@ export default function ProfilePage() {
          const upload = async () => {
               try{
                     await changePhoto(file);
+                    const updatedUser = await getUsers();
+                    setUsers(updatedUser);
+
               }catch(err){
                 console.log("Error al subir la imagen", err)
               }
@@ -87,7 +111,6 @@ export default function ProfilePage() {
             {/* PANEL LATERAL IZQUIERDO */}
             <div className="w-full md:w-80 shrink-0">
                 
-                {/* PANEL LATERAL IZQUIERDO REAL (AHORA ES FIXED) */}
                 <aside className="mt-17 w-full md:w-80 md:fixed md:top-8 md:max-h-[calc(90vh-4rem)] overflow-y-auto bg-(--color-bg-card) rounded-3xl p-8 flex flex-col items-center gap-6 border border-(--color-border) shadow-xl">
                 
                 <div className="relative">
@@ -157,39 +180,84 @@ export default function ProfilePage() {
             {/* PANEL PRINCIPAL DERECHO */}
             <main className="flex-1 flex flex-col gap-8">
             
-            <section className="bg-(--color-bg-card) rounded-3xl p-8 border border-(--color-border) shadow-xl">
+            <section className="bg-(--color-bg-card) rounded-3xl p-8 border border-(--color-border) shadow-xl overflow-hidden">
             <h3 className="text-(--color-text) text-2xl font-bold mb-8">
                 My Stories
             </h3>
 
-            <div
-                className={
-                stories.length > 3
-                    ? "flex gap-6 overflow-x-auto pb-2"
-                    : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                }
-            >
-                {stories.map((story) => (
-                <div
-                    key={story.storyId}
-                    className={stories.length > 3 ? "min-w-75 shrink-0" : ""}
-                >
-                    <StoryCard story={story} />
+            <div className="w-full">
+  
+                <div className="overflow-hidden max-w-[60vw] mx-auto relative">
+                    
+                    {/* BOTÓN IZQUIERDO */}
+                    <button
+                      onClick={prev}
+                      disabled={currentIndex === 0}
+                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/50 text-white px-3 py-2 rounded-full"
+                    >
+                      ←
+                    </button>
+
+                    {/* TRACK */}
+                    <div
+                      className={
+                        stories.length > 3
+                          ? "flex gap-6 transition-transform duration-300 h-80"
+                          : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                      }
+                      style={{
+                        transform: `translateX(-${currentIndex * CARD_WIDTH}px)`
+                      }}
+                    >
+                      {stories.map((story) => (
+                        <div
+                          key={story.storyId}
+                          className={stories.length > 3 ? "min-w-[300px] shrink-0" : ""}
+                        >
+                          <StoryCard story={story} onClick={() => navigate(`/story/${story.storyId}`)} />
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* BOTÓN DERECHO */}
+                    <button
+                      onClick={next}
+                      disabled={currentIndex >= stories.length - VISIBLE}
+                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/50 text-white px-3 py-2 rounded-full"
+                    >
+                      →
+                    </button>
+
                 </div>
-                ))}
             </div>
             </section>
             
-            {/* SECCIÓN MY CONTRIBUTIONS (Con Placeholder) */}
+            {/* SECCIÓN MY CONTRIBUTIONS */}
             <section className="bg-(--color-bg-card) rounded-3xl p-8 border border-(--color-border) shadow-xl">
                 <h3 className="text-(--color-text) text-2xl font-bold mb-8">My Contributions</h3>
                 
-                {/* Aquí insertarás tu componente ContributionFragment mediante un map() más adelante */}
-                <div className="space-y-4">
-                <div className="p-6 border border-dashed border-(--color-border) rounded-xl text-center text-(--color-text-muted) bg-(--color-bg-main) opacity-50">
-                    {/* <ContributionFragment /> */}
-                    [ Placeholder para el componente de Fragmentos ]
-                </div>
+                <div className="space-y-4 max-h-[200px] overflow-y-auto pr-2">
+                
+                   <div className="space-y-6">
+                    {fragments.length === 0 ? (
+                        <div className="text-center text-(--color-text-muted)">
+                        No contributions yet
+                        </div>
+                    ) : (
+                        fragments.map((fragment) => {
+                        const story = stories.find(s => s.storyId === fragment.storyId);
+
+                        return (
+                            <UserFragmentCard
+                            key={fragment.fragmentId}
+                            fragment={fragment}
+                            story={story}
+                            user={users}
+                            />
+                        );
+                        })
+                    )}
+                    </div>
                 </div>
 
             </section>

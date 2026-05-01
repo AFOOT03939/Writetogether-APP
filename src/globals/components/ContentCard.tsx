@@ -106,7 +106,7 @@ export default function ContentCard({
           rows={4}
         />
 
-        {/* ✨ AI CORRECTION INLINE */}
+        {/* AI CORRECTION INLINE */}
         {onAiGenerate && (
           <div className="flex gap-2">
             <input
