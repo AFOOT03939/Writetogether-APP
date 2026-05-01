@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { createFragment, deleteFragment, generateText, getFragments, getUser, updateFragment, uploadImageFragments } from '../api/story.api';
+import { createFragment, deleteFragment, generateText, getFragments, getFullStory, getUser, updateFragment, uploadImageFragments } from '../api/story.api';
 import type { Fragment } from '../models/fragments.model';
 import { useParams } from 'react-router-dom';
 import ContentCard from '../../../globals/components/ContentCard';
 import { buildCorrectionPrompt } from '../../../globals/utils/aiPrompt';
+import FullStoryCard from './fullStoryCard';
 
 interface Props {
   isFinished: boolean;
@@ -15,12 +16,13 @@ export default function StoryCard({ isFinished, role, isCreator }: Props) {
   const [fragments, setFragments] = useState<Fragment[]>([]);
   const [newFragment, setNewFragment] = useState("");
   const [currentUser, setCurrentUser] = useState<any>();
-
+ 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [showAiInput] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [fullStory, setFullStory] = useState<string | null>(null);
 
   const { storyId } = useParams();
 
@@ -42,6 +44,20 @@ export default function StoryCard({ isFinished, role, isCreator }: Props) {
     fetch();
     fetchUser();
   }, [storyId]);
+
+  useEffect(() => {
+  if (!storyId || !isFinished) return;
+
+  const fetchFull = async () => {
+    const data = await getFullStory(storyId);
+
+    if (data && data.length > 0) {
+      setFullStory(data[0].summaryText);
+    }
+  };
+
+  fetchFull();
+}, [storyId, isFinished]);
 
   const handleRemoveImage = () => {
     setImageFile(null);
@@ -104,6 +120,26 @@ export default function StoryCard({ isFinished, role, isCreator }: Props) {
     <div className="bg-(--color-bg-card) rounded-xl border border-(--color-border) shadow-2xl flex flex-col w-full">
 
       {/* LISTA */}
+      <div className="bg-(--color-bg-card) rounded-xl border border-(--color-border) shadow-2xl flex flex-col w-full">
+
+  {/* 🔥 MODO FINAL */}
+  {isFinished ? (
+    <div className="p-6">
+      {fullStory ? (
+        <FullStoryCard
+          content={fullStory}
+          storyTitle="Final Story"
+          author={currentUser?.userName}
+        />
+      ) : (
+        <p className="text-(--color-text-muted)">
+          Generating final story...
+        </p>
+      )}
+    </div>
+  ) : (
+    <>
+      {/* 🔥 MODO NORMAL (lo que ya tenías) */}
       <div className="flex flex-col divide-y divide-[rgba(255,255,255,0.05)] max-h-screen h-100 overflow-y-auto">
         {fragments.length === 0 ? (
           <p className="text-(--color-text-muted) p-4 text-sm">
@@ -134,15 +170,22 @@ export default function StoryCard({ isFinished, role, isCreator }: Props) {
                     instruction
                   });
 
-                  const res = await generateText(f.fragmentId, prompt);
-
-                  return res;
+                  return await generateText(f.fragmentId, prompt);
                 }}
               />
             </div>
           ))
         )}
       </div>
+
+      {canWrite && (
+        <div className="p-6 border-t border-(--color-border) bg-[rgba(0,0,0,0.1)] rounded-b-xl">
+          {/* tu form sin cambios */}
+        </div>
+      )}
+    </>
+  )}
+</div>
 
       {canWrite && (
       <div className="p-6 border-t border-(--color-border) bg-[rgba(0,0,0,0.1)] rounded-b-xl">

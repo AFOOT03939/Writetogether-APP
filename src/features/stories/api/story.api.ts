@@ -193,3 +193,19 @@ export async function getUserStoryRating(storyId: string, userId: number) {
 
   return data as number | null;
 }
+
+export async function generateFullStory(storyId: string, prompt: string) {
+  const { data } = await axiosClient.post(
+    `/ai-text/generate-full/${storyId}`,
+    { prompt }
+  );
+
+  return data.content;
+}
+export async function getFullStory(storyId: string) {
+  const { data } = await axiosClient.get(
+    `/storiesAll/${storyId}`
+  );
+
+  return data;
+}

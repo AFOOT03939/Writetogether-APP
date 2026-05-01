@@ -4,8 +4,10 @@ import StoryCard from '../components/storyCard';
 import CommentsSection from '../components/commentSection';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { StoriesModel } from '../models/story.model';
-import { getStory, getUser, getUserRole, joinStory, leaveStory, updateStory, createStory, uploadImage } from '../api/story.api';
+import { getStory, getUser, getUserRole, joinStory, leaveStory, updateStory, createStory, uploadImage, getFragments, generateFullStory } from '../api/story.api';
 import type { User } from '../../../globals/models/user.model';
+import { buildCorrectionPrompt } from '../../../globals/utils/aiPrompt';
+import type { Fragment } from '../models/fragments.model';
 
 export default function ReadStoryPage() {
   const [story, setStory] = useState<StoriesModel>({
@@ -140,12 +142,34 @@ export default function ReadStoryPage() {
   }, [isCreate]);
 
   const handleStatusChange = async (newStatus: "active" | "finished") => {
-    if (!storyId) return;
+  if (!storyId) return;
 
-    await updateStory(storyId, newStatus);
+  if (newStatus === "finished") {
+    try {
+      const fragments = await getFragments(storyId);
 
-    setStory(prev => ({ ...prev, status: newStatus }));
-  };
+      const fullText = fragments
+        .map((f: Fragment) => f.content)
+        .filter(Boolean)
+        .join("\n\n");
+
+      const prompt = buildCorrectionPrompt({
+        currentText: fullText,
+        fullContext: fullText,
+        instruction: "Rewrite the full story into a clean, coherent final version"
+      });
+
+      await generateFullStory(storyId, prompt);
+
+    } catch (err) {
+      console.error("Error generating full story", err);
+    }
+  }
+
+  await updateStory(storyId, newStatus);
+
+  setStory(prev => ({ ...prev, status: newStatus }));
+};
   
   return (
     <>
