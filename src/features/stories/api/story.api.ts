@@ -1,6 +1,6 @@
 import axiosClient from "../../../api/axiosClient"
 import type { RatingModel } from "../models/rates.model"
-import type { StoriesModel, StoriesModelRequest } from "../models/story.model"
+import type { StoriesModelRequest } from "../models/story.model"
 
 export async function getUser(){
     const {data} = await axiosClient.get(`/auth/me`)

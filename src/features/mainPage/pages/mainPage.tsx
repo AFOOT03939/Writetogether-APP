@@ -3,6 +3,7 @@ import "../css/mainpage.css"
 import type { Story } from "../../../globals/models/storyCard.model";
 import { getStories } from "../api/main.api";
 import StoryCard from "../../../globals/components/storyCard";
+import MenuFoto from "../../../assets/MenuFoto.png";
 import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
@@ -45,7 +46,7 @@ export default function HomePage() {
           <div className="hero-image">
 
             <img 
-              src="/src/assets/MenuFoto.png"
+              src={MenuFoto}
               className="hero-img"
             />
 

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: '/api', //viene del proxy en vite.config
+  baseURL: (import.meta.env.VITE_API_URL || '') + '/api', // usa la variable de entorno o vacío y añade /api
   headers: {
     'Content-Type': 'application/json',
   },

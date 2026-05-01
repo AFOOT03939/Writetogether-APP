@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import SideCard from '../components/sideCard';
 import StoryCard from '../components/storyCard';
 import CommentsSection from '../components/commentSection';
-import { useNavigate, useParams } from 'react-router-dom';
-import type { StoriesModel, StoriesModelRequest } from '../models/story.model';
-import { createStory, getStory, getUser, getUserRole, joinStory, leaveStory, updateStory, uploadImage } from '../api/story.api';
+import { useParams, useNavigate } from 'react-router-dom';
+import type { StoriesModel } from '../models/story.model';
+import { getStory, getUser, getUserRole, joinStory, leaveStory, updateStory, createStory, uploadImage } from '../api/story.api';
 import type { User } from '../../../globals/models/user.model';
 
 export default function ReadStoryPage() {
@@ -24,10 +24,33 @@ export default function ReadStoryPage() {
     tags: [] 
   });
 
-  const [isCollaborator, setIsCollaborator] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>();
-  const navigate = useNavigate()
   const {storyId} = useParams();
+  const navigate = useNavigate();
+
+  const handleSaveNewStory = async () => {
+    try {
+      const res = await createStory({
+        title: story.title || "Untitled",
+        description: story.description,
+        userId: currentUser?.userId || 0,
+        visibility: story.visibility || "public",
+        status: story.status || "active",
+        categoryIds: story.categoryIds || [],
+        imageUrl: story.imageUrl
+      });
+
+      if (res.storyId && imageFile) {
+        await uploadImage(res.storyId.toString(), imageFile);
+      }
+
+      if (res.storyId) {
+        navigate(`/story/${res.storyId}`);
+      }
+    } catch (error) {
+      console.error("Failed to create story", error);
+    }
+  };
   const [imageFile, setImageFile] = useState<File | null>(null); 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [role, setRole] = useState<"creator" | "editor" | "viewer">("viewer");
@@ -74,38 +97,6 @@ export default function ReadStoryPage() {
     fetchStory();
     fetchRole();
   }, [storyId]);
-
-  const handleSave = async () => {
-    try{
-
-      if (!currentUser) return;
-      console.log("request", story)
-      const storyRequest: StoriesModelRequest = {
-        title: story.title,
-        description: story.description,
-        userId: currentUser.userId, 
-        status: story.status,
-        visibility: "public",
-        imageUrl: story.imageUrl,
-        categoryIds: story.categoryIds
-      };
-
-      if(isCreate){
-        const res = await createStory(storyRequest)
-
-        //sube la imagen
-        if (imageFile) {
-          await uploadImage(res.storyId, imageFile);
-        }
-
-        alert("insertado correctamente")
-        navigate(`/story/${res.storyId}`);
-      }
-
-    }catch(err){
-      console.log(err)
-    }
-  }
 
   const handleJoin = async () => {
     if (!storyId) return;
@@ -356,6 +347,15 @@ export default function ReadStoryPage() {
                   className="px-6 py-2 rounded-lg bg-green-600 text-white hover:brightness-110 transition font-bold text-sm shadow-md"
                 >
                   Activate Story
+                </button>
+              )}
+
+              {isCreate && (
+                <button
+                  onClick={handleSaveNewStory}
+                  className="px-6 py-2 rounded-lg bg-green-600 text-white hover:brightness-110 transition font-bold text-sm shadow-md"
+                >
+                  Create Story
                 </button>
               )}
 

@@ -23,7 +23,7 @@ describe('StoryCard Fragment', () => {
 
   test('crea un fragmento correctamente', async () => {
 
-    render(<StoryCard />);
+    render(<StoryCard isFinished={false} role="creator" isCreator={true} />);
 
     await waitFor(() => {
       expect(screen.getByText('Write next fragment')).toBeTruthy();

@@ -19,7 +19,7 @@ export default function StoryCard({ isFinished, role, isCreator }: Props) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const [showAiInput, setShowAiInput] = useState(false);
+  const [showAiInput] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
 
   const { storyId } = useParams();
@@ -43,22 +43,9 @@ export default function StoryCard({ isFinished, role, isCreator }: Props) {
     fetchUser();
   }, [storyId]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-    setShowAiInput(false);
-  };
-
   const handleRemoveImage = () => {
     setImageFile(null);
     setImagePreview(null);
-  };
-
-  const handleAiGenerate = () => {
-    console.log("AI prompt:", aiPrompt);
   };
 
   const handleSubmit = async () => {
