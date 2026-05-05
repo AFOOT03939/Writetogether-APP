@@ -4,6 +4,7 @@ import MainLayout from '../layout/pages/mainLayout';
 import CategoryPage from '../features/categories/pages/categoryPage';
 import ProfilePage from '../features/profile/pages/profilePage';
 import StoryPage from '../features/stories/pages/storyPage';
+import WikiPage from '../features/wikipedia/pages/wikiPage';
 
 export default function AppRoutes() {
   return (
@@ -51,6 +52,15 @@ export default function AppRoutes() {
           element={
             <MainLayout>
               <StoryPage />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/story/:storyId/wikiPage"
+          element={
+            <MainLayout>
+              <WikiPage />
             </MainLayout>
           }
         />
